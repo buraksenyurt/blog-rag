@@ -67,6 +67,9 @@ profiles:
 ```
 blog-rag/
 ├── PLAN.md
+├── AGENTS.md                 # AI ajanları için kurallar (CLAUDE.md bunu import eder)
+├── CLAUDE.md
+├── .claude/settings.json     # Claude Code izinleri (blog reposuna yazma yasak)
 ├── docker-compose.yml        # qdrant + neo4j (profile'lar ile ayrı ayrı açılabilir)
 ├── .env.example              # LMSTUDIO_URL, LLM modeli, DB adresleri, POSTS_DIR
 ├── embedding_profiles.yaml   # embedding modeli + doc/query şablonları

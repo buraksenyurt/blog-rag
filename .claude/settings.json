@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(../buraksenyurt.github.io/**)",
+      "Write(../buraksenyurt.github.io/**)",
+      "Bash(git -C ../buraksenyurt.github.io:*)",
+      "Read(./.env)"
+    ],
+    "allow": [
+      "Read(../buraksenyurt.github.io/_posts/**)",
+      "Bash(uv run:*)",
+      "Bash(uv sync)",
+      "Bash(docker compose ps)",
+      "Bash(docker compose logs:*)"
+    ]
+  }
+}

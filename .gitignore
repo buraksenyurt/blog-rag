@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# blog-rag
+data/
+qdrant_storage/
+neo4j/
+.claude/settings.local.json
