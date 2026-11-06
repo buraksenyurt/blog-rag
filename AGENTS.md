@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Şu an sadece plan aşamasındayız, henüz kod yazılmadı. Sıradaki iş PLAN.md içindeki *Adım Sırası → Faz 1 → 1. İskelet* maddesi.
+**Durum:** Faz 1 / Adım 1 (iskelet) tamamlandı. Sıradaki iş *Adım 2: loader + chunker*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -38,10 +38,12 @@ Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
 ## Komutlar
 
-> Proje iskeleti kuruldukça bu bölüm güncellenecek.
+> Henüz yazılmamış modüller (ingest, ask, eval) ilgili adımlarda eklenecek.
 
 ```bash
 uv sync                                      # bağımlılıkları kur
+copy .env.example .env                       # ayarlar (PowerShell: Copy-Item)
+uv run python -m scripts.smoke_test          # LM Studio / Qdrant / kaynak klasör kontrolü
 docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
 uv run python -m phase1_vector.ingest        # indexle

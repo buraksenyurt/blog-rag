@@ -211,7 +211,7 @@ blog-rag/
 ## 5. Adım Sırası (iş listesi)
 
 **Faz 1**
-1. İskelet: `pyproject.toml`, `.env.example`, `docker-compose.yml` (qdrant), LM Studio smoke test
+1. ✅ İskelet: `pyproject.toml`, `.env.example`, `docker-compose.yml` (qdrant), LM Studio smoke test
 2. `loader.py` + `chunker.py` → `data/chunks.jsonl` + chunk istatistikleri (dağılım, en uzun chunk'lar)
 3. `lmstudio.py` + `ingest.py` → Qdrant'ın dolması
 4. `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)

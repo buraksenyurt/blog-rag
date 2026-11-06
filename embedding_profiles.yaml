@@ -1,0 +1,26 @@
+# Embedding profilleri. Kod prefix bilmez; doküman/sorgu şablonları burada tutulur.
+# Şablon değişkenleri: {text}, {title}
+# "model" değeri LM Studio'nun /v1/models listesindeki id ile birebir aynı olmalıdır.
+active: embeddinggemma
+
+profiles:
+  embeddinggemma:
+    model: text-embedding-embeddinggemma-300m
+    dim: 768
+    max_tokens: 2048
+    doc_template: "title: {title} | text: {text}"
+    query_template: "task: search result | query: {text}"
+
+  bge-m3:
+    model: text-embedding-bge-m3
+    dim: 1024
+    max_tokens: 8192
+    doc_template: "{text}"
+    query_template: "{text}"
+
+  multilingual-e5-large:
+    model: text-embedding-multilingual-e5-large-instruct
+    dim: 1024
+    max_tokens: 512
+    doc_template: "{text}"
+    query_template: "Instruct: Given a question, retrieve relevant blog passages\nQuery: {text}"
