@@ -7,7 +7,6 @@ Kullanım:
 from __future__ import annotations
 
 import argparse
-import math
 import sys
 from collections.abc import Callable
 
@@ -17,6 +16,7 @@ from qdrant_client import QdrantClient
 from common.config import ensure_writable, get_settings, load_embedding_profile
 from common.embeddings import Embedder
 from common.llm import LLM
+from common.vectors import cosine
 
 results: list[tuple[str, bool, str]] = []
 
@@ -29,11 +29,6 @@ def check(name: str, fn: Callable[[], str]) -> bool:
     except Exception as exc:  # noqa: BLE001 - teşhis amaçlı tüm hataları raporla
         results.append((name, False, f"{type(exc).__name__}: {exc}"))
         return False
-
-
-def cosine(a: list[float], b: list[float]) -> float:
-    dot = sum(x * y for x, y in zip(a, b, strict=True))
-    return dot / (math.sqrt(sum(x * x for x in a)) * math.sqrt(sum(y * y for y in b)))
 
 
 def main() -> int:

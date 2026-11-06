@@ -21,6 +21,7 @@ from qdrant_client import QdrantClient, models
 from common.config import EmbeddingProfile, ensure_writable, get_settings, load_embedding_profile
 from common.embedding_cache import EmbeddingCache
 from common.embeddings import Embedder
+from common.vectors import cosine
 from phase1_vector.store import ensure_collection, existing_ids, point_id
 
 UPSERT_BATCH = 128
@@ -63,29 +64,50 @@ def batched(items: list, size: int) -> Iterator[list]:
         yield items[start : start + size]
 
 
-def check_tokens(chunks: list[dict], embedder: Embedder, profile: EmbeddingProfile, n: int) -> None:
-    """En büyük n chunk'ın gerçek token sayısını ölçer, model sınırını aşanları raporlar."""
+TRUNCATION_PROBE = " Bu cümle yalnızca kırpılma testi için eklenmiştir." * 400
+
+
+def is_truncated(text: str, embedder: Embedder, threshold: float = 0.9999) -> bool:
+    """Metnin sonuna uzun bir ek yapılınca vektör değişmiyorsa model girdiyi kırpıyordur."""
+    base, probe = embedder.embed_raw([text, text + TRUNCATION_PROBE])
+    return cosine(base, probe) >= threshold
+
+
+def check_tokens(chunks: list[dict], embedder: Embedder, profile: EmbeddingProfile, n: int) -> int:
+    """En büyük n chunk'ın model sınırına sığıp sığmadığını kontrol eder.
+
+    LM Studio usage döndürürse gerçek token sayısı, döndürmezse kırpılma testi kullanılır.
+    Sınırı aşan chunk sayısını döner.
+    """
     if n <= 0 or not chunks:
-        return
+        return 0
     largest = sorted(chunks, key=lambda c: len(c["text"]), reverse=True)[:n]
-    ratios: list[float] = []
-    over: list[tuple[str, int]] = []
-    for chunk in largest:
-        text = embedding_input(chunk, embedder)
-        tokens = embedder.count_tokens(text)
-        if tokens is None:
-            print("! LM Studio usage döndürmedi; token kontrolü atlandı.")
-            return
-        ratios.append(len(text) / tokens)
-        if tokens > profile.max_tokens:
-            over.append((chunk["id"], tokens))
-    print(
-        f"Token kontrolü ({len(largest)} en büyük chunk): "
-        f"ortalama {sum(ratios) / len(ratios):.2f} karakter/token, "
-        f"en kötü {min(ratios):.2f}"
-    )
-    for chunk_id, tokens in over:
-        print(f"! {chunk_id}: {tokens} token > {profile.max_tokens} (model kırpacak)")
+    texts = [(c["id"], embedding_input(c, embedder)) for c in largest]
+
+    tokens = embedder.count_tokens(texts[0][1])
+    if tokens is not None:
+        over = 0
+        ratios = []
+        for chunk_id, text in texts:
+            count = embedder.count_tokens(text) or 0
+            ratios.append(len(text) / max(count, 1))
+            if count > profile.max_tokens:
+                over += 1
+                print(f"! {chunk_id}: {count} token > {profile.max_tokens}")
+        print(
+            f"Token kontrolü ({len(texts)} en büyük chunk): ortalama "
+            f"{sum(ratios) / len(ratios):.2f} karakter/token, en kötü {min(ratios):.2f}"
+        )
+        return over
+
+    print(f"LM Studio usage döndürmedi; {len(texts)} en büyük chunk için kırpılma testi yapılıyor.")
+    truncated = [(cid, len(text)) for cid, text in texts if is_truncated(text, embedder)]
+    for chunk_id, chars in truncated:
+        print(f"! {chunk_id}: {chars} karakter, model girdiyi kırpıyor")
+    fits = [len(t) for cid, t in texts if cid not in {c for c, _ in truncated}]
+    if not truncated:
+        print(f"Kırpılma yok. En büyük chunk ({max(fits)} karakter) model sınırına sığıyor.")
+    return len(truncated)
 
 
 def ingest(
@@ -160,11 +182,14 @@ def main() -> int:
     parser.add_argument("--recreate", action="store_true", help="collection'ı silip yeniden kur")
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument(
+        "--check-only", action="store_true", help="sadece token/kırpılma kontrolü yap, ingest etme"
+    )
+    parser.add_argument(
         "--check-tokens",
         type=int,
         default=10,
         metavar="N",
-        help="en büyük N chunk'ın gerçek token sayısını ölç (0 = kapalı)",
+        help="en büyük N chunk model sınırına sığıyor mu kontrol et (0 = kapalı)",
     )
     args = parser.parse_args()
 
@@ -178,7 +203,10 @@ def main() -> int:
     client = QdrantClient(url=settings.qdrant_url, timeout=60)
 
     print(f"Profil: {profile.name} ({profile.model}, {profile.dim}) | chunk: {len(chunks)}")
-    check_tokens(chunks, embedder, profile, args.check_tokens)
+    over = check_tokens(chunks, embedder, profile, args.check_tokens)
+    if args.check_only:
+        cache.close()
+        return 1 if over else 0
     # --limit ile kısmi çalıştırmada collection'daki diğer kayıtlar silinmesin.
     report = ingest(chunks, embedder, cache, client, args.recreate, delete_stale=not args.limit)
     cache.close()

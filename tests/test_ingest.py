@@ -88,3 +88,17 @@ def test_payload_filter_fields(setup) -> None:
     ingest([chunk(0)], embedder, cache, client)
     point = client.retrieve(collection_name(PROFILE), [point_id(chunk(0)["id"])])[0]
     assert point.payload["tags"] == ["rust"] and point.payload["text"] == "metin 0"
+
+
+class TruncatingEmbedder(FakeEmbedder):
+    """İlk 50 karakterden sonrasını görmeyen model taklidi."""
+
+    def embed_raw(self, inputs: list[str]) -> list[list[float]]:
+        return [[float(len(t[:50])), float(100 - len(t[:50])), 1.0, 1.0] for t in inputs]
+
+
+def test_truncation_probe() -> None:
+    from phase1_vector.ingest import is_truncated
+
+    assert is_truncated("x" * 80, TruncatingEmbedder())
+    assert not is_truncated("kısa", TruncatingEmbedder())

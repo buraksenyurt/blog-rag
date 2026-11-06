@@ -123,6 +123,7 @@ blog-rag/
 - Qdrant collection adı `blog_posts__{profil}`. Vektör boyutu profilden okunacak, mesafe `Cosine`.
 - Payload index'leri: `tags`, `categories`, `year`, `code_langs`, `has_code`.
 - Point ID, `slug + chunk_index` değerinden üretilen deterministik bir UUID olacak. Böylece aynı chunk ikinci kez eklenmez (idempotent upsert).
+- Uygulama (Adım 3): LM Studio embedding yanıtında `usage` döndürmüyor. Bu yüzden token kontrolü kırpılma testiyle yapılıyor: metnin sonuna uzun bir ek yapılıp vektör değişiyor mu diye bakılıyor (`ingest --check-only`). İlk tam ingest 10.463 chunk için ~65 dakika sürdü.
 - Uygulama (Adım 3): cache `data/embeddings/{profil}.sqlite` dosyasında (float32). Embedding girdisinin başlığı `{yazı başlığı} > {section_path}` şeklinde. Ingest 512'lik pencerelerle ilerliyor. Artık chunks.jsonl'da olmayan eski kayıtlar collection'dan siliniyor. Ingest'ten önce en büyük 10 chunk'ın gerçek token sayısı ölçülüyor ve model sınırını aşanlar raporlanıyor.
 
 ### 1.5 Retrieval (`retrieve.py`)
@@ -131,7 +132,8 @@ blog-rag/
 3. **Hafif filtre çıkarımı:** sorguda geçen dil/teknoloji adları tag sözlüğüyle eşleştirilecek (ör. "Rust" → `tags: rust` veya `code_langs: rust`). Bu filtre önce *should* (boost) olarak denenecek. Sonuç azsa filtresiz aramaya dönülecek.
 4. Aynı yazıdan gelen çok fazla chunk olmaması için post başına en fazla 3 chunk alınacak, ardından MMR çeşitlendirmesi yapılacak.
 5. Son olarak top-n (n=5–6) chunk context'e verilecek. Context bütçesi Llama 3'ün 8K penceresine göre ~4K token.
-6. *(Opsiyonel 1.5b)* Cross-encoder reranker eklenebilir (`bge-reranker-v2-m3`, çok dilli, lokal). Kalite farkı eval ile ölçülecek.
+6. Uygulama (Adım 4): Filtre çıkarımı serbest tag eşleştirmesiyle değil, küratörlü bir teknoloji sözlüğüyle yapılıyor (`phase1_vector/query_filters.py`), çünkü blogda `as`, `is`, `get`, `list` gibi tag'ler var. Filtreli ve filtresiz iki arama yapılıp sonuçlar birleştiriliyor, filtreye uyan adaylar +0.05 boost alıyor. Böylece filtre az sonuç verirse filtresiz sonuçlar zaten listede oluyor. Seçim MMR ile yapılıyor (λ=0.7, post başına en fazla 3 chunk, ~3.500 token bütçe).
+7. *(Opsiyonel 1.5b)* Cross-encoder reranker eklenebilir (`bge-reranker-v2-m3`, çok dilli, lokal). Kalite farkı eval ile ölçülecek.
 
 ### 1.6 Üretim (`ask.py`)
 - Sistem prompt'u: "Yalnızca verilen bağlama dayan, Türkçe cevap ver, kod örneklerini bağlamdan uyarla, sonunda kaynak yazıları listele. Bağlam yetersizse bunu açıkça söyle."
@@ -215,7 +217,7 @@ blog-rag/
 1. ✅ İskelet: `pyproject.toml`, `.env.example`, `docker-compose.yml` (qdrant), LM Studio smoke test
 2. ✅ `loader.py` + `chunker.py` → `data/chunks.jsonl` + chunk istatistikleri (dağılım, en uzun chunk'lar)
 3. ✅ `embeddings.py` + `embedding_cache.py` + `ingest.py` → Qdrant'ın dolması
-4. `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
+4. ✅ `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
 5. `ask.py` → uçtan uca cevap
 6. Eval seti + ilk ölçüm. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3).
 
