@@ -123,6 +123,7 @@ blog-rag/
 - Qdrant collection adı `blog_posts__{profil}`. Vektör boyutu profilden okunacak, mesafe `Cosine`.
 - Payload index'leri: `tags`, `categories`, `year`, `code_langs`, `has_code`.
 - Point ID, `slug + chunk_index` değerinden üretilen deterministik bir UUID olacak. Böylece aynı chunk ikinci kez eklenmez (idempotent upsert).
+- Uygulama (Adım 3): cache `data/embeddings/{profil}.sqlite` dosyasında (float32). Embedding girdisinin başlığı `{yazı başlığı} > {section_path}` şeklinde. Ingest 512'lik pencerelerle ilerliyor. Artık chunks.jsonl'da olmayan eski kayıtlar collection'dan siliniyor. Ingest'ten önce en büyük 10 chunk'ın gerçek token sayısı ölçülüyor ve model sınırını aşanlar raporlanıyor.
 
 ### 1.5 Retrieval (`retrieve.py`)
 1. Sorgu `embed_query()` ile embed edilecek (aktif profilin şablonu kullanılır).
@@ -213,7 +214,7 @@ blog-rag/
 **Faz 1**
 1. ✅ İskelet: `pyproject.toml`, `.env.example`, `docker-compose.yml` (qdrant), LM Studio smoke test
 2. ✅ `loader.py` + `chunker.py` → `data/chunks.jsonl` + chunk istatistikleri (dağılım, en uzun chunk'lar)
-3. `lmstudio.py` + `ingest.py` → Qdrant'ın dolması
+3. ✅ `embeddings.py` + `embedding_cache.py` + `ingest.py` → Qdrant'ın dolması
 4. `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
 5. `ask.py` → uçtan uca cevap
 6. Eval seti + ilk ölçüm. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3).

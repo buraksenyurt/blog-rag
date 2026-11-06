@@ -24,7 +24,7 @@ def percentile(values: list[int], q: float) -> int:
     return ordered[min(len(ordered) - 1, int(q * len(ordered)))]
 
 
-def show(slug: str, cfg: ChunkerConfig) -> int:
+def show(slug: str, cfg: ChunkerConfig, preview: int = 0) -> int:
     settings = get_settings()
     path = settings.posts_dir / f"{slug}.md"
     if not path.exists():
@@ -33,8 +33,12 @@ def show(slug: str, cfg: ChunkerConfig) -> int:
     post = load_post(path)
     print(f"{post.title} | {post.url}\ntags={post.tags} links={post.links}\n")
     for c in chunk_post(post, cfg):
-        print(f"=== {c.id} | ~{c.n_tokens} tok | {c.section_path or '-'} | {c.code_langs}")
-        print(c.text[:600] + (" …" if len(c.text) > 600 else ""))
+        flags = f" | fences={c.text.count('```')}" + (" | CODE_SPLIT" if c.code_split else "")
+        print(f"=== {c.id} | ~{c.n_tokens} tok | {c.section_path or '-'} | {c.code_langs}{flags}")
+        if preview and len(c.text) > preview:
+            print(c.text[:preview] + f"\n[... önizleme kısaltıldı, toplam {len(c.text)} karakter]")
+        else:
+            print(c.text)
         print()
     return 0
 
@@ -97,11 +101,14 @@ def build(cfg: ChunkerConfig) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="chunks.jsonl üretir")
     parser.add_argument("--show", metavar="SLUG", help="tek bir yazının chunk'larını göster")
+    parser.add_argument(
+        "--preview", type=int, default=0, help="--show çıktısını N karakterle sınırla (0 = tam)"
+    )
     parser.add_argument("--target", type=int, default=ChunkerConfig.target_tokens)
     parser.add_argument("--max", type=int, default=ChunkerConfig.max_tokens)
     args = parser.parse_args()
     cfg = ChunkerConfig(target_tokens=args.target, max_tokens=args.max)
-    return show(args.show, cfg) if args.show else build(cfg)
+    return show(args.show, cfg, args.preview) if args.show else build(cfg)
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 / Adım 1 (iskelet) ve Adım 2 (loader + chunker) tamamlandı. Sıradaki iş *Adım 3: embedding + Qdrant ingest*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 / Adım 1 (iskelet), Adım 2 (loader + chunker) ve Adım 3 (embedding cache + Qdrant ingest) tamamlandı. Sıradaki iş *Adım 4: retrieval*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -47,7 +47,7 @@ uv run python -m scripts.smoke_test          # LM Studio / Qdrant / kaynak klas�
 uv run python -m scripts.build_chunks        # data/chunks.jsonl + chunk_stats.json (--show SLUG ile tek yazı)
 docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
-uv run python -m phase1_vector.ingest        # indexle
+uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate)
 uv run python -m phase1_vector.ask "soru"    # sor (--debug ile retrieval skorları)
 uv run python -m eval.run_eval --phase 1     # değerlendir
 uv run ruff check . && uv run pytest         # lint + test

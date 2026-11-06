@@ -19,6 +19,7 @@ class Embedder:
         self.settings = settings or get_settings()
         self.profile = profile or load_embedding_profile(self.settings)
         self.batch_size = batch_size
+        self.last_prompt_tokens: int | None = None
         self._client = OpenAI(
             base_url=self.settings.lmstudio_url,
             api_key=self.settings.lmstudio_api_key,
@@ -47,9 +48,12 @@ class Embedder:
     def embed_raw(self, inputs: Sequence[str]) -> list[list[float]]:
         """Şablonu zaten uygulanmış metinleri embed eder."""
         vectors: list[list[float]] = []
+        prompt_tokens = 0
         for start in range(0, len(inputs), self.batch_size):
             batch = list(inputs[start : start + self.batch_size])
             response = self._client.embeddings.create(model=self.profile.model, input=batch)
+            usage = getattr(response, "usage", None)
+            prompt_tokens += getattr(usage, "prompt_tokens", 0) or 0
             for item in sorted(response.data, key=lambda d: d.index):
                 if len(item.embedding) != self.profile.dim:
                     raise ValueError(
@@ -57,4 +61,11 @@ class Embedder:
                         f"gelen {len(item.embedding)}. embedding_profiles.yaml'ı kontrol edin."
                     )
                 vectors.append(item.embedding)
+        # LM Studio usage döndürmezse None kalır.
+        self.last_prompt_tokens = prompt_tokens or None
         return vectors
+
+    def count_tokens(self, formatted_input: str) -> int | None:
+        """Tek bir girdinin gerçek token sayısını embedding yanıtındaki usage'dan okur."""
+        self.embed_raw([formatted_input])
+        return self.last_prompt_tokens
