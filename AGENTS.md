@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 / Adım 1 (iskelet) tamamlandı. Sıradaki iş *Adım 2: loader + chunker*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 / Adım 1 (iskelet) ve Adım 2 (loader + chunker) tamamlandı. Sıradaki iş *Adım 3: embedding + Qdrant ingest*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -44,6 +44,7 @@ Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 uv sync                                      # bağımlılıkları kur
 copy .env.example .env                       # ayarlar (PowerShell: Copy-Item)
 uv run python -m scripts.smoke_test          # LM Studio / Qdrant / kaynak klasör kontrolü
+uv run python -m scripts.build_chunks        # data/chunks.jsonl + chunk_stats.json (--show SLUG ile tek yazı)
 docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
 uv run python -m phase1_vector.ingest        # indexle

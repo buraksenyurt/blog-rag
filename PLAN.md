@@ -116,7 +116,7 @@ blog-rag/
 - Bölüm ~500 token'ı aşarsa paragraf sınırlarından bölünecek. Ardışık chunk'lar arasında ~15% overlap olacak.
 - **Kod blokları asla ortadan bölünmeyecek.** Bir kod bloğu çok büyükse tek başına chunk olacak, önündeki açıklama paragrafı da yanına eklenecek.
 - Her chunk için şu metadata tutulacak: `post_slug, title, date, year, tags, categories, section_path, chunk_index, has_code, code_langs[]`.
-- Çıktı `data/chunks.jsonl` dosyasına yazılacak. Tahmini 15–20 bin chunk çıkacak.
+- Çıktı `data/chunks.jsonl` dosyasına yazılacak. Gerçekleşen (Adım 2): 868 yazıdan **10.463 chunk** çıktı (p50 ~360, p90 ~535, max 1.500 tahmini token). 4.620 chunk kod içeriyor, 165 chunk dev kod bloğu bölünmesiyle oluştu. Büyük markdown tabloları satır sınırından bölünüyor, başlık satırları her parçada tekrarlanıyor.
 
 ### 1.4 Embedding ve Indexleme (`ingest.py`)
 - Embedding istekleri 32–64'lük batch'lerle gönderilecek. Cache anahtarı `sha256(profil + şablonlanmış text)` olacak. Böylece tekrar çalıştırmada sadece değişen chunk'lar embed edilecek.
@@ -175,7 +175,7 @@ blog-rag/
 - Bu adım tek başına güçlü bir graph çıkarıyor çünkü front matter zaten kaliteli.
 
 ### 2.4 LLM ile Kavram Çıkarımı (`extract_entities.py`) — kapsamı sınırlı tutulacak
-- 8B bir modelle 15–20 bin chunk işlemek yavaş olur, sonuçlar da gürültülü çıkar. Bu yüzden önce bir pilot yapılacak: yalnızca `rust` + 2–3 tag alt kümesi (~100–150 yazı).
+- 8B bir modelle ~10,5 bin chunk işlemek yavaş olur, sonuçlar da gürültülü çıkar. Bu yüzden önce bir pilot yapılacak: yalnızca `rust` + 2–3 tag alt kümesi (~100–150 yazı).
 - JSON şemalı prompt kullanılacak: `{concepts: [{name, type}], relations: [{source, target, type}]}`. Bunun için LM Studio'nun structured output (`response_format: json_schema`) desteği kullanılacak.
 - Kavram isimleri normalize edilecek (küçük harf, TR/EN eşleştirmesi, örn. "değişken gölgeleme" ↔ "shadowing"). Bunun için embedding benzerliğiyle birleştirme yapılacak.
 - Sonuçlar yeterince iyiyse kapsam genişletilecek. Değilse sadece deterministik graph ile devam edilecek.
@@ -212,7 +212,7 @@ blog-rag/
 
 **Faz 1**
 1. ✅ İskelet: `pyproject.toml`, `.env.example`, `docker-compose.yml` (qdrant), LM Studio smoke test
-2. `loader.py` + `chunker.py` → `data/chunks.jsonl` + chunk istatistikleri (dağılım, en uzun chunk'lar)
+2. ✅ `loader.py` + `chunker.py` → `data/chunks.jsonl` + chunk istatistikleri (dağılım, en uzun chunk'lar)
 3. `lmstudio.py` + `ingest.py` → Qdrant'ın dolması
 4. `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
 5. `ask.py` → uçtan uca cevap
@@ -229,4 +229,4 @@ blog-rag/
 ## 6. Açık Konular / Riskler
 - **Llama 3 8B Türkçe kalitesi:** model kıyası 1.6'da yapılacak. Context penceresi 8K olduğu için context bütçesi sıkı tutulmalı.
 - **Eski yazılar (2003–2012):** ağırlıklı olarak .NET/WCF içeriği var. Zaman filtresi veya tarih ağırlığı gerekebilir, eval sonuçlarına göre karar verilecek.
-- **Embedding süresi:** 15–20 bin chunk işlenecek. Lokal GPU'da birkaç dakika ile onlarca dakika arasında sürebilir. Cache sayesinde bu maliyet bir kez ödenecek.
+- **Embedding süresi:** ~10,5 bin chunk işlenecek. Lokal GPU'da birkaç dakika ile onlarca dakika arasında sürebilir. Cache sayesinde bu maliyet bir kez ödenecek.
