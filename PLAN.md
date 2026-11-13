@@ -210,6 +210,7 @@ blog-rag/
   - **Yapısal:** "2009'da en çok hangi konuda yazılmış?" (Faz 2 bu tipte avantajlı olmalı)
 - Retrieval metrikleri: Recall@k, MRR. Cevap kalitesi elle 1–5 puan ile değerlendirilecek, istenirse büyük bir modelle LLM-as-judge da yapılabilir.
 - Bütün sonuçlar `eval/results/{faz}-{model}-{tarih}.json` olarak kaydedilecek.
+- Uygulama (Adım 6): `eval/questions.yaml` dosyasında 35 soru var: 29 example, 3 relational, 3 structural. Beklenen yazılar korpusta aranarak elle eşlendi, tamamı doğrulandı. `eval/run_eval.py` retrieval varyantlarını (`plain`, `filter`, `filter+code`, `full`) aynı sorgu vektörüyle kıyaslıyor. Metrikler post seviyesinde: Hit@ctx, Recall@ctx, MRR@20, Recall@20. `--with-llm` cevapları da üretiyor ve atıf oranı, Türkçe oranı ve süreyi ölçüyor. Manuel 1-5 puanlama için ayrıca bir markdown dosyası yazıyor.
 
 ---
 
@@ -221,7 +222,7 @@ blog-rag/
 3. ✅ `embeddings.py` + `embedding_cache.py` + `ingest.py` → Qdrant'ın dolması
 4. ✅ `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
 5. ✅ `ask.py` → uçtan uca cevap
-6. Eval seti + ilk ölçüm. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3).
+6. ✅ Eval seti + ölçüm aracı. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3). *(İlk ölçüm sonuçları bekleniyor.)*
 
 **Faz 2**
 7. Neo4j compose'a eklenecek + `build_graph.py` (deterministik graph + vector index)

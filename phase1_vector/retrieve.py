@@ -100,11 +100,15 @@ class Retriever:
         ).points
         return [Hit(str(p.id), p.score, p.payload or {}, list(p.vector)) for p in points]
 
-    def retrieve(self, query: str, **overrides) -> RetrievalResult:
+    def retrieve(
+        self, query: str, vector: list[float] | None = None, **overrides
+    ) -> RetrievalResult:
+        """vector verilirse sorgu yeniden embed edilmez (eval'de varyant kıyası için)."""
         cfg = replace(self.config, **overrides) if overrides else self.config
         query_filter = detect_filter(query) if cfg.use_filter else None
         code_intent = cfg.code_boost > 0 and detect_code_intent(query)
-        vector = self.embedder.embed_query(query)
+        if vector is None:
+            vector = self.embedder.embed_query(query)
 
         candidates = {h.id: h for h in self._search(vector, cfg.k, None)}
         filtered_count = 0

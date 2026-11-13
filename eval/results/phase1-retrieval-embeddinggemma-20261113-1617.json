@@ -1,0 +1,1052 @@
+{
+  "phase": 1,
+  "embedding_profile": "embeddinggemma",
+  "created": "20261113-1617",
+  "retrieval_defaults": {
+    "k": 20,
+    "n": 6,
+    "use_filter": true,
+    "boost": 0.05,
+    "max_per_post": 3,
+    "mmr_lambda": 0.7,
+    "token_budget": 3500,
+    "code_boost": 0.02,
+    "expand_short": true,
+    "short_tokens": 150
+  },
+  "variants": {
+    "full": {}
+  },
+  "summary": {
+    "full": {
+      "hit_ctx": 0.969,
+      "recall_ctx": 0.891,
+      "mrr": 0.888,
+      "recall_k": 0.977,
+      "hit_ctx[example]": 0.966,
+      "hit_ctx[relational]": 1.0
+    }
+  },
+  "questions": [
+    {
+      "id": "rust-variables",
+      "type": "example",
+      "relevant": [
+        "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+        "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+        "2021-12-24-programcidan-programciya-rust",
+        "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig",
+            "2022-04-24-rust-pratikleri-oop"
+          ],
+          "context_tokens": 3156
+        }
+      }
+    },
+    {
+      "id": "rust-shadowing",
+      "type": "example",
+      "relevant": [
+        "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 0.14285714285714285,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2026-05-09-rust-phantom-data",
+            "2022-04-24-rust-pratikleri-oop",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2022-05-22-rust-pratikleri-value-moved-here"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-04-24-rust-pratikleri-oop",
+            "2022-05-22-rust-pratikleri-value-moved-here",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2026-05-09-rust-phantom-data"
+          ],
+          "context_tokens": 2981
+        }
+      }
+    },
+    {
+      "id": "rust-lifetimes",
+      "type": "example",
+      "relevant": [
+        "2022-03-06-rust-pratikleri-lifetimes-mevzusu",
+        "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 0.5,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-03-06-rust-pratikleri-lifetimes-mevzusu",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-03-06-rust-pratikleri-lifetimes-mevzusu",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2025-02-14-rust-ve-guvenli-bellek-yonetimi-hakkinda"
+          ],
+          "context_tokens": 1922
+        }
+      }
+    },
+    {
+      "id": "rust-single-mut-ref",
+      "type": "example",
+      "relevant": [
+        "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir",
+            "2025-02-14-rust-ve-guvenli-bellek-yonetimi-hakkinda",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi"
+          ],
+          "top_candidates": [
+            "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2021-12-24-programcidan-programciya-rust",
+            "2025-02-14-rust-ve-guvenli-bellek-yonetimi-hakkinda",
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig"
+          ],
+          "context_tokens": 1841
+        }
+      }
+    },
+    {
+      "id": "rust-trait-objects",
+      "type": "example",
+      "relevant": [
+        "2022-05-01-rust-pratikleri-trait-objects",
+        "2022-05-15-rust-pratikleri-state-tasarim-kalibi"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.5,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2022-05-01-rust-pratikleri-trait-objects",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye",
+            "2021-12-24-programcidan-programciya-rust",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+          ],
+          "top_candidates": [
+            "2022-05-01-rust-pratikleri-trait-objects",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye",
+            "2021-12-24-programcidan-programciya-rust",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2022-04-24-rust-pratikleri-oop"
+          ],
+          "context_tokens": 2053
+        }
+      }
+    },
+    {
+      "id": "rust-channels",
+      "type": "example",
+      "relevant": [
+        "2022-02-20-rust-pratikleri-channels"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 0.5,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2022-02-20-rust-pratikleri-channels",
+            "2021-12-24-programcidan-programciya-rust"
+          ],
+          "top_candidates": [
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2022-02-20-rust-pratikleri-channels",
+            "2022-02-06-rust-pratikleri-multithreading",
+            "2021-12-24-programcidan-programciya-rust",
+            "2026-05-22-micro-rust"
+          ],
+          "context_tokens": 1695
+        }
+      }
+    },
+    {
+      "id": "rust-phantomdata",
+      "type": "example",
+      "relevant": [
+        "2026-05-09-rust-phantom-data"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2026-05-09-rust-phantom-data",
+            "2025-12-01-rust-ile-kodlama-idmanlari-ileri-seviye",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye",
+            "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir"
+          ],
+          "top_candidates": [
+            "2026-05-09-rust-phantom-data",
+            "2025-12-01-rust-ile-kodlama-idmanlari-ileri-seviye",
+            "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir",
+            "2022-02-27-rust-pratikleri-gdb-ile-debug-islemleri",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye"
+          ],
+          "context_tokens": 2386
+        }
+      }
+    },
+    {
+      "id": "rust-warp-tokio",
+      "type": "example",
+      "relevant": [
+        "2020-11-13-rust-dilinde-warp-tokio-kufelerini-kullanarak-asenkron-web-api-gelistirmek"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2020-11-13-rust-dilinde-warp-tokio-kufelerini-kullanarak-asenkron-web-api-gelistirmek",
+            "2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak",
+            "2024-05-24-rust-wasm-web-api-ve-can-ban-board"
+          ],
+          "top_candidates": [
+            "2020-11-13-rust-dilinde-warp-tokio-kufelerini-kullanarak-asenkron-web-api-gelistirmek",
+            "2024-05-24-rust-wasm-web-api-ve-can-ban-board",
+            "2025-01-27-sunucu-metriklerini-izleme-rust-ve-wasm-ile",
+            "2025-12-01-rust-ile-kodlama-idmanlari-ileri-seviye",
+            "2026-09-01-rust-kiwi-app"
+          ],
+          "context_tokens": 1902
+        }
+      }
+    },
+    {
+      "id": "rust-value-moved",
+      "type": "example",
+      "relevant": [
+        "2022-05-22-rust-pratikleri-value-moved-here"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2022-05-22-rust-pratikleri-value-moved-here",
+            "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak"
+          ],
+          "top_candidates": [
+            "2022-05-22-rust-pratikleri-value-moved-here",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir",
+            "2021-12-24-programcidan-programciya-rust",
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig"
+          ],
+          "context_tokens": 2527
+        }
+      }
+    },
+    {
+      "id": "go-goroutine-channel",
+      "type": "example",
+      "relevant": [
+        "2017-05-15-golang-concurrency-goroutine-channel"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2017-05-15-golang-concurrency-goroutine-channel",
+            "2017-07-22-golang-google-protobuf-kullanimi",
+            "2017-01-13-gopher-olma-calismalari",
+            "2017-06-18-golang-ticker-ile-periyodik-is-calistirma"
+          ],
+          "top_candidates": [
+            "2017-05-15-golang-concurrency-goroutine-channel",
+            "2017-06-18-golang-ticker-ile-periyodik-is-calistirma",
+            "2017-07-22-golang-google-protobuf-kullanimi",
+            "2017-01-13-gopher-olma-calismalari",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+          ],
+          "context_tokens": 2089
+        }
+      }
+    },
+    {
+      "id": "go-defer-panic",
+      "type": "example",
+      "relevant": [
+        "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim",
+            "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek",
+            "2017-05-15-golang-concurrency-goroutine-channel",
+            "2017-01-06-go-dilini-anlamaya-calisirken"
+          ],
+          "top_candidates": [
+            "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim",
+            "2017-05-15-golang-concurrency-goroutine-channel",
+            "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek",
+            "2017-06-18-golang-ticker-ile-periyodik-is-calistirma",
+            "2017-01-13-gopher-olma-calismalari"
+          ],
+          "context_tokens": 1506
+        }
+      }
+    },
+    {
+      "id": "go-no-inheritance",
+      "type": "example",
+      "relevant": [
+        "2017-02-25-golang-kalitimsiz-bir-dunya",
+        "2017-06-04-golang-kalitim-icin-gomulu-tiplerin-kullanimi"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.5,
+          "mrr": 0.14285714285714285,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2017-01-13-gopher-olma-calismalari",
+            "2017-06-09-golang-bir-go-paketini-ruby-den-cagirmak",
+            "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim",
+            "2017-07-22-golang-google-protobuf-kullanimi",
+            "2017-02-25-golang-kalitimsiz-bir-dunya"
+          ],
+          "top_candidates": [
+            "2017-01-13-gopher-olma-calismalari",
+            "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim",
+            "2017-06-09-golang-bir-go-paketini-ruby-den-cagirmak",
+            "2017-07-22-golang-google-protobuf-kullanimi",
+            "2017-01-28-golang-harici-paket-package-yazip-kullanmak"
+          ],
+          "context_tokens": 1380
+        }
+      }
+    },
+    {
+      "id": "csharp-extension-methods",
+      "type": "example",
+      "relevant": [
+        "2008-03-21-csharp-3-0-derinlemesine-extension-method-kavrami",
+        "2012-06-07-cerezlik-algoritmalar-ve-extension-methodlar"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2008-03-21-csharp-3-0-derinlemesine-extension-method-kavrami",
+            "2013-06-09-csharp-in-enteresan-yanlari",
+            "2014-04-03-csharp-6-0-yeni-esintiler",
+            "2012-06-07-cerezlik-algoritmalar-ve-extension-methodlar"
+          ],
+          "top_candidates": [
+            "2008-03-21-csharp-3-0-derinlemesine-extension-method-kavrami",
+            "2013-06-09-csharp-in-enteresan-yanlari",
+            "2014-04-03-csharp-6-0-yeni-esintiler",
+            "2017-03-18-csharp-6-0-collection-initializers-icin-add-metodunu-yonlendirmek",
+            "2012-06-07-cerezlik-algoritmalar-ve-extension-methodlar"
+          ],
+          "context_tokens": 1699
+        }
+      }
+    },
+    {
+      "id": "tpl-cancellation",
+      "type": "example",
+      "relevant": [
+        "2009-06-08-tpl-iptal-islemi-beta-1",
+        "2009-11-12-task-parallel-library-tpl-iptal-islemi-beta-2",
+        "2011-04-23-task-iptal-islemlerinin-izlenmesi-monitoring-cancellation",
+        "2011-04-26-composite-cancellations"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.5,
+          "mrr": 1.0,
+          "recall_k": 0.75,
+          "context_posts": [
+            "2009-06-08-tpl-iptal-islemi-beta-1",
+            "2009-11-12-task-parallel-library-tpl-iptal-islemi-beta-2",
+            "2009-06-03-tpl-task-parallel-library-nedir-beta-1"
+          ],
+          "top_candidates": [
+            "2009-06-08-tpl-iptal-islemi-beta-1",
+            "2009-11-12-task-parallel-library-tpl-iptal-islemi-beta-2",
+            "2009-06-03-tpl-task-parallel-library-nedir-beta-1",
+            "2009-06-04-tpl-icin-onemli-bir-kavram-task-beta-1",
+            "2011-04-23-task-iptal-islemlerinin-izlenmesi-monitoring-cancellation"
+          ],
+          "context_tokens": 2012
+        }
+      }
+    },
+    {
+      "id": "parallel-for",
+      "type": "example",
+      "relevant": [
+        "2009-06-09-for-mu-foreach-mi-yoksa-parallel-for-mu-parallel-foreach-mi-beta-1"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 0.0,
+          "recall_ctx": 0.0,
+          "mrr": 0.14285714285714285,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2009-12-16-forparallelism",
+            "2009-06-07-tpl-ile-winforms-macerasi-beta-1",
+            "2011-12-02-parallel-programming-reduction",
+            "2010-05-16-int32-ve-int64-haricindekiler-icin-parallel-foreach",
+            "2009-06-18-parallel-for-metodu-icin-stop-break-kullanimi-beta-1",
+            "2009-05-28-plinq-forall-beta-1"
+          ],
+          "top_candidates": [
+            "2009-12-16-forparallelism",
+            "2011-12-02-parallel-programming-reduction",
+            "2010-05-16-int32-ve-int64-haricindekiler-icin-parallel-foreach",
+            "2009-06-18-parallel-for-metodu-icin-stop-break-kullanimi-beta-1",
+            "2009-05-28-plinq-forall-beta-1"
+          ],
+          "context_tokens": 2140
+        }
+      }
+    },
+    {
+      "id": "lazy-t",
+      "type": "example",
+      "relevant": [
+        "2009-12-14-net-4-0-lazy-initialization-beta-2",
+        "2010-10-11-tembellik-etmek-istiyorum-generic-lazy-tipi-ile-et",
+        "2010-10-18-generic-lazy-tipi-olmasaydi"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2010-10-18-generic-lazy-tipi-olmasaydi",
+            "2009-12-14-net-4-0-lazy-initialization-beta-2",
+            "2010-10-11-tembellik-etmek-istiyorum-generic-lazy-tipi-ile-et"
+          ],
+          "top_candidates": [
+            "2010-10-18-generic-lazy-tipi-olmasaydi",
+            "2010-10-11-tembellik-etmek-istiyorum-generic-lazy-tipi-ile-et",
+            "2009-12-14-net-4-0-lazy-initialization-beta-2"
+          ],
+          "context_tokens": 1813
+        }
+      }
+    },
+    {
+      "id": "interlocked",
+      "type": "example",
+      "relevant": [
+        "2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked",
+            "2026-03-26-pi-sayisini-hesaplama-yolunda",
+            "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig",
+            "2025-12-01-rust-ile-kodlama-idmanlari-ileri-seviye",
+            "2004-01-01-cok-kanalli-multithread-uygulamalar"
+          ],
+          "top_candidates": [
+            "2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked",
+            "2026-03-26-pi-sayisini-hesaplama-yolunda",
+            "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig",
+            "2025-12-01-rust-ile-kodlama-idmanlari-ileri-seviye",
+            "2004-01-01-cok-kanalli-multithread-uygulamalar"
+          ],
+          "context_tokens": 1931
+        }
+      }
+    },
+    {
+      "id": "boxing-unboxing",
+      "type": "example",
+      "relevant": [
+        "2003-12-30-boxing-kutulamak-ve-unboxing-kutuyu-kaldirmak",
+        "2005-09-26-boxing-ve-unboxing-performans-kritigi"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2005-09-26-boxing-ve-unboxing-performans-kritigi",
+            "2003-12-30-boxing-kutulamak-ve-unboxing-kutuyu-kaldirmak"
+          ],
+          "top_candidates": [
+            "2005-09-26-boxing-ve-unboxing-performans-kritigi",
+            "2003-12-30-boxing-kutulamak-ve-unboxing-kutuyu-kaldirmak",
+            "2009-07-30-service-orientation-vs-object-orientation"
+          ],
+          "context_tokens": 1434
+        }
+      }
+    },
+    {
+      "id": "csharp-yield",
+      "type": "example",
+      "relevant": [
+        "2005-07-05-csharp-2-0-icin-iterasyon-yenilikleri",
+        "2009-07-30-tasarim-desenleri-iterator"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2005-07-05-csharp-2-0-icin-iterasyon-yenilikleri",
+            "2009-07-30-tasarim-desenleri-iterator",
+            "2010-05-16-int32-ve-int64-haricindekiler-icin-parallel-foreach"
+          ],
+          "top_candidates": [
+            "2005-07-05-csharp-2-0-icin-iterasyon-yenilikleri",
+            "2009-07-30-tasarim-desenleri-iterator",
+            "2010-05-16-int32-ve-int64-haricindekiler-icin-parallel-foreach",
+            "2008-03-21-csharp-3-0-derinlemesine-extension-method-kavrami",
+            "2017-03-18-csharp-6-0-collection-initializers-icin-add-metodunu-yonlendirmek"
+          ],
+          "context_tokens": 2002
+        }
+      }
+    },
+    {
+      "id": "wcf-soap-to-rest",
+      "type": "example",
+      "relevant": [
+        "2009-04-17-soap-bazli-wcf-servislerini-rest-modeline-tasimak"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2009-04-17-soap-bazli-wcf-servislerini-rest-modeline-tasimak",
+            "2009-11-19-microsoftdotnet-services-service-bus-icin-rest-tabanli-hello-world",
+            "2009-04-20-wcf-rest-modelinde-uritemplate-kullanimi",
+            "2009-04-23-rest-tabanli-wcf-servisleri-icin-istemci-yazmak"
+          ],
+          "top_candidates": [
+            "2009-04-17-soap-bazli-wcf-servislerini-rest-modeline-tasimak",
+            "2009-11-19-microsoftdotnet-services-service-bus-icin-rest-tabanli-hello-world",
+            "2009-04-20-wcf-rest-modelinde-uritemplate-kullanimi",
+            "2009-04-23-rest-tabanli-wcf-servisleri-icin-istemci-yazmak",
+            "2008-02-14-web-bazli-programlama-modeli"
+          ],
+          "context_tokens": 2111
+        }
+      }
+    },
+    {
+      "id": "wcf-uritemplate",
+      "type": "example",
+      "relevant": [
+        "2009-04-20-wcf-rest-modelinde-uritemplate-kullanimi",
+        "2008-02-14-web-bazli-programlama-modeli"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2009-04-20-wcf-rest-modelinde-uritemplate-kullanimi",
+            "2010-03-07-wcf-webhttp-services-routing",
+            "2010-07-12-silverlight-tarafinda-http-bazli-servisleri-kullanmak",
+            "2008-02-14-web-bazli-programlama-modeli"
+          ],
+          "top_candidates": [
+            "2009-04-20-wcf-rest-modelinde-uritemplate-kullanimi",
+            "2010-03-07-wcf-webhttp-services-routing",
+            "2010-04-08-wcf-webhttp-services-ozel-formatta-mesaj-dondurmek",
+            "2008-02-14-web-bazli-programlama-modeli",
+            "2009-04-17-soap-bazli-wcf-servislerini-rest-modeline-tasimak"
+          ],
+          "context_tokens": 1392
+        }
+      }
+    },
+    {
+      "id": "ef-generic-repository",
+      "type": "example",
+      "relevant": [
+        "2014-12-14-entity-framework-generic-repository-ve-unit-of-work-uyarlamasi"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2014-12-14-entity-framework-generic-repository-ve-unit-of-work-uyarlamasi",
+            "2013-02-08-entity-framework-code-first-icin-calculated-fields-kullanimi",
+            "2013-07-17-word-dosyasi-icerisinden-entity-framework-e",
+            "2011-04-01-entity-framework-uzerinde-transactionscope-kullanimi"
+          ],
+          "top_candidates": [
+            "2014-12-14-entity-framework-generic-repository-ve-unit-of-work-uyarlamasi",
+            "2011-04-01-entity-framework-uzerinde-transactionscope-kullanimi",
+            "2013-07-17-word-dosyasi-icerisinden-entity-framework-e",
+            "2013-02-08-entity-framework-code-first-icin-calculated-fields-kullanimi",
+            "2021-05-14-effective-engine-bir-uzay-macerasi"
+          ],
+          "context_tokens": 2442
+        }
+      }
+    },
+    {
+      "id": "aspnetcore-di-lifetimes",
+      "type": "example",
+      "relevant": [
+        "2021-04-30-aspdotnet-core-dependency-lifetimes",
+        "2021-04-29-aspdotnet-core-dependency-injection-turleri"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.5,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-04-30-aspdotnet-core-dependency-lifetimes",
+            "2018-10-17-net-core-web-api-uygulamalarini-windows-service-ustunden-sunmak",
+            "2012-11-14-aspdotnet-web-api-leri-aspx-den-asenkron-cagirmak",
+            "2021-04-25-aspdotnet-core-a-nasil-merhaba-deriz"
+          ],
+          "top_candidates": [
+            "2021-04-30-aspdotnet-core-dependency-lifetimes",
+            "2021-04-25-aspdotnet-core-a-nasil-merhaba-deriz",
+            "2012-11-14-aspdotnet-web-api-leri-aspx-den-asenkron-cagirmak",
+            "2021-04-29-aspdotnet-core-dependency-injection-turleri",
+            "2018-02-09-core-web-api-icin-planlanmis-gorevler"
+          ],
+          "context_tokens": 1841
+        }
+      }
+    },
+    {
+      "id": "docker-compose",
+      "type": "example",
+      "relevant": [
+        "2020-02-28-su-docker-compose-dedikleri"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2020-02-28-su-docker-compose-dedikleri",
+            "2026-09-07-light-mail-server",
+            "2026-09-01-rust-kiwi-app",
+            "2020-07-22-yine-yeni-yeniden-elk-bu-sefer-e-ve-k-icin-docker-compose-isin-icinde"
+          ],
+          "top_candidates": [
+            "2020-02-28-su-docker-compose-dedikleri",
+            "2026-09-07-light-mail-server",
+            "2020-07-22-yine-yeni-yeniden-elk-bu-sefer-e-ve-k-icin-docker-compose-isin-icinde",
+            "2026-09-01-rust-kiwi-app",
+            "2019-05-06-peki-ya-kong-kim"
+          ],
+          "context_tokens": 1484
+        }
+      }
+    },
+    {
+      "id": "rabbitmq-dotnet",
+      "type": "example",
+      "relevant": [
+        "2020-11-23-net-core-tarafindan-rabbitmq-ya-mesaj-gondermek-ve-java-tarafindan-dinlemek",
+        "2018-09-09-west-world-un-rabbitmq-ile-tanismasinin-zamani-gelmisti"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2020-11-23-net-core-tarafindan-rabbitmq-ya-mesaj-gondermek-ve-java-tarafindan-dinlemek",
+            "2018-09-09-west-world-un-rabbitmq-ile-tanismasinin-zamani-gelmisti"
+          ],
+          "top_candidates": [
+            "2020-11-23-net-core-tarafindan-rabbitmq-ya-mesaj-gondermek-ve-java-tarafindan-dinlemek",
+            "2018-09-09-west-world-un-rabbitmq-ile-tanismasinin-zamani-gelmisti",
+            "2021-03-30-tie-fighter-degil-project-tye",
+            "2004-05-22-net-remoting-i-kavramak",
+            "2017-12-01-apache-kafka-ile-konusmaya-calismak"
+          ],
+          "context_tokens": 1919
+        }
+      }
+    },
+    {
+      "id": "ruby-yield-block",
+      "type": "example",
+      "relevant": [
+        "2015-08-20-ruby-kod-parcaciklari-10-yield-ve-block-kullanimi"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2015-08-20-ruby-kod-parcaciklari-10-yield-ve-block-kullanimi",
+            "2017-05-05-ruby-kod-parcaciklari-34-fiber-ve-es-zamanli-programlama",
+            "2015-08-25-ruby-kod-parcaciklari-11-procs",
+            "2015-09-03-ruby-kod-parcaciklari-13-exception-handling"
+          ],
+          "top_candidates": [
+            "2015-08-20-ruby-kod-parcaciklari-10-yield-ve-block-kullanimi",
+            "2017-05-05-ruby-kod-parcaciklari-34-fiber-ve-es-zamanli-programlama",
+            "2015-08-25-ruby-kod-parcaciklari-11-procs",
+            "2015-08-12-ruby-kod-parcaciklari-6-siniflarda-accessor-setter-ve-attribute-kullanimlari",
+            "2015-08-30-ruby-kod-parcaciklari-12-lambda"
+          ],
+          "context_tokens": 3113
+        }
+      }
+    },
+    {
+      "id": "python-flask-rest",
+      "type": "example",
+      "relevant": [
+        "2016-09-22-python-ve-flask-ile-rest-tabanli-servis-gelistirmek"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2016-09-22-python-ve-flask-ile-rest-tabanli-servis-gelistirmek",
+            "2017-08-09-python-flask-ile-basit-bir-web-uygulamasi-gelistirmek",
+            "2016-07-18-raspberry-pi-derken-olusan-python-calisma-notlarim"
+          ],
+          "top_candidates": [
+            "2016-09-22-python-ve-flask-ile-rest-tabanli-servis-gelistirmek",
+            "2017-08-09-python-flask-ile-basit-bir-web-uygulamasi-gelistirmek",
+            "2016-07-18-raspberry-pi-derken-olusan-python-calisma-notlarim",
+            "2019-09-09-bir-python-uygulamasini-git-teknigi-ile-azure-platformuna-tasimak",
+            "2020-01-14-python-tarafinda-protobuf-protocol-buffers-serilestirme"
+          ],
+          "context_tokens": 1568
+        }
+      }
+    },
+    {
+      "id": "fake-smtp-server",
+      "type": "example",
+      "relevant": [
+        "2026-09-07-light-mail-server"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2026-09-07-light-mail-server",
+            "2020-12-07-mountebank-ile-mock-servis-destegi-sunmak",
+            "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi",
+            "2026-03-13-hexagonal-architecture-101"
+          ],
+          "top_candidates": [
+            "2026-09-07-light-mail-server",
+            "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi",
+            "2020-12-07-mountebank-ile-mock-servis-destegi-sunmak",
+            "2026-03-13-hexagonal-architecture-101",
+            "2026-04-26-ai-sandbox"
+          ],
+          "context_tokens": 2285
+        }
+      }
+    },
+    {
+      "id": "dotnet-mcp-server",
+      "type": "example",
+      "relevant": [
+        "2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak"
+          ],
+          "top_candidates": [
+            "2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak"
+          ],
+          "context_tokens": 477
+        }
+      }
+    },
+    {
+      "id": "ecs-rust-csharp",
+      "type": "relational",
+      "relevant": [
+        "2026-09-02-csharp-ecs",
+        "2024-11-06-rust-ile-ecs-yaklasimini-anlamak"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2024-11-06-rust-ile-ecs-yaklasimini-anlamak",
+            "2026-09-02-csharp-ecs",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye",
+            "2026-04-01-smart-enums"
+          ],
+          "top_candidates": [
+            "2024-11-06-rust-ile-ecs-yaklasimini-anlamak",
+            "2026-09-02-csharp-ecs",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye",
+            "2026-04-01-smart-enums",
+            "2022-04-24-rust-pratikleri-oop"
+          ],
+          "context_tokens": 2124
+        }
+      }
+    },
+    {
+      "id": "method-args-csharp-rust-zig",
+      "type": "relational",
+      "relevant": [
+        "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig",
+            "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig"
+          ],
+          "top_candidates": [
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig",
+            "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig"
+          ],
+          "context_tokens": 1623
+        }
+      }
+    },
+    {
+      "id": "shared-data-threads",
+      "type": "relational",
+      "relevant": [
+        "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig",
+        "2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.5,
+          "mrr": 1.0,
+          "recall_k": 0.5,
+          "context_posts": [
+            "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig",
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig"
+          ],
+          "top_candidates": [
+            "2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig",
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig"
+          ],
+          "context_tokens": 1825
+        }
+      }
+    },
+    {
+      "id": "count-rust-posts",
+      "type": "structural",
+      "relevant": [],
+      "variants": {
+        "full": {
+          "hit_ctx": 0.0,
+          "recall_ctx": 0.0,
+          "mrr": 0.0,
+          "recall_k": 0.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak",
+            "2025-02-14-rust-ve-guvenli-bellek-yonetimi-hakkinda",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2024-05-24-rust-wasm-web-api-ve-can-ban-board"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2025-12-01-rust-ile-kodlama-idmanlari-ileri-seviye",
+            "2025-11-03-rust-ile-kodlama-idmanlari-orta-seviye",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+          ],
+          "context_tokens": 1992
+        }
+      }
+    },
+    {
+      "id": "golang-years",
+      "type": "structural",
+      "relevant": [],
+      "variants": {
+        "full": {
+          "hit_ctx": 0.0,
+          "recall_ctx": 0.0,
+          "mrr": 0.0,
+          "recall_k": 0.0,
+          "context_posts": [
+            "2017-01-06-go-dilini-anlamaya-calisirken",
+            "2017-03-31-golang-pointers",
+            "2017-06-09-golang-bir-go-paketini-ruby-den-cagirmak",
+            "2017-02-25-golang-kalitimsiz-bir-dunya"
+          ],
+          "top_candidates": [
+            "2017-01-06-go-dilini-anlamaya-calisirken",
+            "2017-03-31-golang-pointers",
+            "2017-01-13-gopher-olma-calismalari",
+            "2017-02-25-golang-kalitimsiz-bir-dunya",
+            "2017-06-04-golang-kalitim-icin-gomulu-tiplerin-kullanimi"
+          ],
+          "context_tokens": 1388
+        }
+      }
+    },
+    {
+      "id": "rust-pratikleri-series",
+      "type": "structural",
+      "relevant": [
+        "2022-01-30-rust-pratikleri-loglama",
+        "2022-02-06-rust-pratikleri-multithreading",
+        "2022-02-13-rust-pratikleri-dokumantasyon",
+        "2022-02-20-rust-pratikleri-channels",
+        "2022-02-27-rust-pratikleri-gdb-ile-debug-islemleri",
+        "2022-03-06-rust-pratikleri-lifetimes-mevzusu",
+        "2022-03-13-rust-pratikleri-serde-json-ve-biraz-eglence",
+        "2022-03-20-rust-pratikleri-http-sunucusu-yazmak-yazmaya-calismak",
+        "2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir",
+        "2022-04-10-rust-pratikleri-wordle-oyunu",
+        "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+        "2022-04-24-rust-pratikleri-oop",
+        "2022-05-01-rust-pratikleri-trait-objects",
+        "2022-05-15-rust-pratikleri-state-tasarim-kalibi",
+        "2022-05-22-rust-pratikleri-value-moved-here"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.2,
+          "mrr": 0.3333333333333333,
+          "recall_k": 0.5333333333333333,
+          "context_posts": [
+            "2024-10-31-birlikte-rust-ogrenelim-serisi",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2022-02-06-rust-pratikleri-multithreading",
+            "2022-05-01-rust-pratikleri-trait-objects",
+            "2022-04-10-rust-pratikleri-wordle-oyunu"
+          ],
+          "top_candidates": [
+            "2024-10-31-birlikte-rust-ogrenelim-serisi",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2022-04-24-rust-pratikleri-oop",
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-02-06-rust-pratikleri-multithreading"
+          ],
+          "context_tokens": 1418
+        }
+      }
+    }
+  ]
+}

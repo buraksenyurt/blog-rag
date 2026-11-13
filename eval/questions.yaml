@@ -1,0 +1,259 @@
+# Altın soru seti (Faz 1 ve Faz 2 ortak)
+# type:
+#   example     -> tek konuya odaklı, örnek/açıklama isteyen soru
+#   relational  -> birden çok kavramı ya da dili ilişkilendiren soru
+#   structural  -> sayma/listeleme gibi yapısal soru (Faz 2'de graph ile cevaplanması beklenir)
+# relevant: cevabın asıl kaynağı olması beklenen yazıların slug'ları (post seviyesi).
+#           Retrieval metrikleri bu listeye göre hesaplanır. structural sorularda boş olabilir.
+# expected: structural sorular için beklenen cevap (manuel kontrol için).
+
+questions:
+  # --- Rust ---
+  - id: rust-variables
+    type: example
+    question: Rust dilinde değişken kullanımları ile ilgili örnekler yaz.
+    relevant:
+      - 2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir
+      - 2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi
+      - 2021-12-24-programcidan-programciya-rust
+      - 2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak
+
+  - id: rust-shadowing
+    type: example
+    question: Rust'ta shadowing nedir, örnekle açıklar mısın?
+    relevant:
+      - 2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir
+
+  - id: rust-lifetimes
+    type: example
+    question: Rust'ta lifetime kavramı neden gereklidir?
+    relevant:
+      - 2022-03-06-rust-pratikleri-lifetimes-mevzusu
+      - 2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir
+
+  - id: rust-single-mut-ref
+    type: example
+    question: Rust'ta aynı anda neden sadece tek bir değiştirilebilir referans olabilir?
+    relevant:
+      - 2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir
+
+  - id: rust-trait-objects
+    type: example
+    question: Rust'ta trait object nasıl kullanılır?
+    relevant:
+      - 2022-05-01-rust-pratikleri-trait-objects
+      - 2022-05-15-rust-pratikleri-state-tasarim-kalibi
+
+  - id: rust-channels
+    type: example
+    question: Rust'ta thread'ler arasında channel ile nasıl mesaj gönderilir?
+    relevant:
+      - 2022-02-20-rust-pratikleri-channels
+
+  - id: rust-phantomdata
+    type: example
+    question: Rust'ta PhantomData ne işe yarar?
+    relevant:
+      - 2026-05-09-rust-phantom-data
+
+  - id: rust-warp-tokio
+    type: example
+    question: Rust ile Warp ve Tokio kullanarak asenkron bir web API nasıl yazılır?
+    relevant:
+      - 2020-11-13-rust-dilinde-warp-tokio-kufelerini-kullanarak-asenkron-web-api-gelistirmek
+
+  - id: rust-value-moved
+    type: example
+    question: Rust'ta "value moved here" hatası neden alınır?
+    relevant:
+      - 2022-05-22-rust-pratikleri-value-moved-here
+
+  # --- Go ---
+  - id: go-goroutine-channel
+    type: example
+    question: Go dilinde goroutine ve channel kullanımına bir örnek verir misin?
+    relevant:
+      - 2017-05-15-golang-concurrency-goroutine-channel
+
+  - id: go-defer-panic
+    type: example
+    question: Go'da defer, panic ve recover nasıl çalışır?
+    relevant:
+      - 2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim
+
+  - id: go-no-inheritance
+    type: example
+    question: Go dilinde kalıtım olmadan kodun yeniden kullanımı nasıl sağlanır?
+    relevant:
+      - 2017-02-25-golang-kalitimsiz-bir-dunya
+      - 2017-06-04-golang-kalitim-icin-gomulu-tiplerin-kullanimi
+
+  # --- C# / .NET ---
+  - id: csharp-extension-methods
+    type: example
+    question: C#'ta extension method nasıl yazılır?
+    relevant:
+      - 2008-03-21-csharp-3-0-derinlemesine-extension-method-kavrami
+      - 2012-06-07-cerezlik-algoritmalar-ve-extension-methodlar
+
+  - id: tpl-cancellation
+    type: example
+    question: TPL ile başlatılan bir task nasıl iptal edilir?
+    relevant:
+      - 2009-06-08-tpl-iptal-islemi-beta-1
+      - 2009-11-12-task-parallel-library-tpl-iptal-islemi-beta-2
+      - 2011-04-23-task-iptal-islemlerinin-izlenmesi-monitoring-cancellation
+      - 2011-04-26-composite-cancellations
+
+  - id: parallel-for
+    type: example
+    question: Parallel.For ile normal for döngüsü arasındaki fark nedir?
+    relevant:
+      - 2009-06-09-for-mu-foreach-mi-yoksa-parallel-for-mu-parallel-foreach-mi-beta-1
+
+  - id: lazy-t
+    type: example
+    question: .NET'teki Lazy<T> tipi ne işe yarar?
+    relevant:
+      - 2009-12-14-net-4-0-lazy-initialization-beta-2
+      - 2010-10-11-tembellik-etmek-istiyorum-generic-lazy-tipi-ile-et
+      - 2010-10-18-generic-lazy-tipi-olmasaydi
+
+  - id: interlocked
+    type: example
+    question: Interlocked sınıfı ile thread güvenli bir sayaç nasıl yapılır?
+    relevant:
+      - 2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked
+
+  - id: boxing-unboxing
+    type: example
+    question: Boxing ve unboxing nedir, performansa etkisi var mıdır?
+    relevant:
+      - 2003-12-30-boxing-kutulamak-ve-unboxing-kutuyu-kaldirmak
+      - 2005-09-26-boxing-ve-unboxing-performans-kritigi
+
+  - id: csharp-yield
+    type: example
+    question: C#'ta yield return ile iterator nasıl yazılır?
+    relevant:
+      - 2005-07-05-csharp-2-0-icin-iterasyon-yenilikleri
+      - 2009-07-30-tasarim-desenleri-iterator
+
+  - id: wcf-soap-to-rest
+    type: example
+    question: SOAP tabanlı bir WCF servisi REST modeline nasıl taşınır?
+    relevant:
+      - 2009-04-17-soap-bazli-wcf-servislerini-rest-modeline-tasimak
+
+  - id: wcf-uritemplate
+    type: example
+    question: WCF REST servislerinde UriTemplate nasıl kullanılır?
+    relevant:
+      - 2009-04-20-wcf-rest-modelinde-uritemplate-kullanimi
+      - 2008-02-14-web-bazli-programlama-modeli
+
+  - id: ef-generic-repository
+    type: example
+    question: Entity Framework ile Generic Repository ve Unit of Work deseni nasıl uygulanır?
+    relevant:
+      - 2014-12-14-entity-framework-generic-repository-ve-unit-of-work-uyarlamasi
+
+  - id: aspnetcore-di-lifetimes
+    type: example
+    question: ASP.NET Core'da transient, scoped ve singleton servis yaşam süreleri arasındaki fark nedir?
+    relevant:
+      - 2021-04-30-aspdotnet-core-dependency-lifetimes
+      - 2021-04-29-aspdotnet-core-dependency-injection-turleri
+
+  # --- Diğer ---
+  - id: docker-compose
+    type: example
+    question: Docker Compose ile birden fazla servis nasıl birlikte ayağa kaldırılır?
+    relevant:
+      - 2020-02-28-su-docker-compose-dedikleri
+
+  - id: rabbitmq-dotnet
+    type: example
+    question: .NET tarafından RabbitMQ kuyruğuna nasıl mesaj gönderilir?
+    relevant:
+      - 2020-11-23-net-core-tarafindan-rabbitmq-ya-mesaj-gondermek-ve-java-tarafindan-dinlemek
+      - 2018-09-09-west-world-un-rabbitmq-ile-tanismasinin-zamani-gelmisti
+
+  - id: ruby-yield-block
+    type: example
+    question: Ruby'de block ve yield nasıl kullanılır?
+    relevant:
+      - 2015-08-20-ruby-kod-parcaciklari-10-yield-ve-block-kullanimi
+
+  - id: python-flask-rest
+    type: example
+    question: Python ve Flask ile REST tabanlı bir servis nasıl geliştirilir?
+    relevant:
+      - 2016-09-22-python-ve-flask-ile-rest-tabanli-servis-gelistirmek
+
+  - id: fake-smtp-server
+    type: example
+    question: Entegrasyon testleri için sahte bir SMTP sunucusu nasıl yazılır?
+    relevant:
+      - 2026-09-07-light-mail-server
+
+  - id: dotnet-mcp-server
+    type: example
+    question: .NET platformunda bir MCP server nasıl yazılır?
+    relevant:
+      - 2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak
+
+  # --- İlişkisel ---
+  - id: ecs-rust-csharp
+    type: relational
+    question: ECS (Entity Component System) yaklaşımı nedir, Rust ve C# tarafında nasıl uygulanmış?
+    relevant:
+      - 2026-09-02-csharp-ecs
+      - 2024-11-06-rust-ile-ecs-yaklasimini-anlamak
+
+  - id: method-args-csharp-rust-zig
+    type: relational
+    question: C#, Rust ve Zig'de metot argümanlarının değiştirilmesi nasıl farklılık gösterir?
+    relevant:
+      - 2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig
+
+  - id: shared-data-threads
+    type: relational
+    question: Çoklu thread ortamında ortak veriyi güvenle değiştirmek için C#, Rust ve Zig'de hangi yöntemler kullanılır?
+    relevant:
+      - 2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig
+      - 2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked
+
+  # --- Yapısal (Faz 2) ---
+  - id: count-rust-posts
+    type: structural
+    question: Blogda Rust ile ilgili kaç yazı var?
+    relevant: []
+    expected: rust veya rust-lang tag'li 46 yazı (2020-2026 arası)
+
+  - id: golang-years
+    type: structural
+    question: Go dili ile ilgili yazılar hangi yıllarda yayınlanmış?
+    relevant: []
+    expected: golang tag'li 27 yazı; 2017 (23), 2018 (1), 2019 (2), 2020 (1)
+
+  - id: rust-pratikleri-series
+    type: structural
+    question: Rust Pratikleri serisinde hangi yazılar var?
+    relevant:
+      - 2022-01-30-rust-pratikleri-loglama
+      - 2022-02-06-rust-pratikleri-multithreading
+      - 2022-02-13-rust-pratikleri-dokumantasyon
+      - 2022-02-20-rust-pratikleri-channels
+      - 2022-02-27-rust-pratikleri-gdb-ile-debug-islemleri
+      - 2022-03-06-rust-pratikleri-lifetimes-mevzusu
+      - 2022-03-13-rust-pratikleri-serde-json-ve-biraz-eglence
+      - 2022-03-20-rust-pratikleri-http-sunucusu-yazmak-yazmaya-calismak
+      - 2022-04-03-rust-pratikleri-ayni-anda-sadece-tek-bir-degistirilebilir-referans-olabilir
+      - 2022-04-10-rust-pratikleri-wordle-oyunu
+      - 2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak
+      - 2022-04-24-rust-pratikleri-oop
+      - 2022-05-01-rust-pratikleri-trait-objects
+      - 2022-05-15-rust-pratikleri-state-tasarim-kalibi
+      - 2022-05-22-rust-pratikleri-value-moved-here
+    expected: 15 yazılık seri (2022-01-30 ile 2022-05-22 arası)
