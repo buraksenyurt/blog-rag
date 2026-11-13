@@ -41,3 +41,20 @@ def test_filter_contents_and_match() -> None:
 
 def test_normalize_query() -> None:
     assert normalize_query("Rust'ın ve C#’ta") == "rust ve c#"
+
+
+@pytest.mark.parametrize(
+    ("query", "expected"),
+    [
+        ("Rust dilinde değişken kullanımları ile ilgili örnekler yaz.", True),
+        ("LINQ ile gruplama kodu göster", True),
+        ("Bunu bir örnekle anlatır mısın?", True),
+        ("Yazılım mimarisinde katmanlar nedir?", False),
+        ("Kodlama standartları neden önemli?", False),
+        ("Rust'ta ownership nedir?", False),
+    ],
+)
+def test_code_intent(query: str, expected: bool) -> None:
+    from phase1_vector.query_filters import detect_code_intent
+
+    assert detect_code_intent(query) is expected

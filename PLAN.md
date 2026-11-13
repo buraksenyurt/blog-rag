@@ -116,7 +116,7 @@ blog-rag/
 - Bölüm ~500 token'ı aşarsa paragraf sınırlarından bölünecek. Ardışık chunk'lar arasında ~15% overlap olacak.
 - **Kod blokları asla ortadan bölünmeyecek.** Bir kod bloğu çok büyükse tek başına chunk olacak, önündeki açıklama paragrafı da yanına eklenecek.
 - Her chunk için şu metadata tutulacak: `post_slug, title, date, year, tags, categories, section_path, chunk_index, has_code, code_langs[]`.
-- Çıktı `data/chunks.jsonl` dosyasına yazılacak. Gerçekleşen (Adım 2): 868 yazıdan **10.463 chunk** çıktı (p50 ~360, p90 ~535, max 1.500 tahmini token). 4.620 chunk kod içeriyor, 165 chunk dev kod bloğu bölünmesiyle oluştu. Büyük markdown tabloları satır sınırından bölünüyor, başlık satırları her parçada tekrarlanıyor.
+- Çıktı `data/chunks.jsonl` dosyasına yazılacak. Gerçekleşen: 868 yazıdan **10.515 chunk** (p50 ~360, p90 ~540 tahmini token). Kırpılma testi kodlu Türkçe metinde oranın ~2,4 karakter/token'a kadar düştüğünü gösterdi. 1.500 tokenlik üst sınırda (~4.800 karakter) en büyük 30 chunk'tan 5'i kırpılıyordu. Bu yüzden üst sınır **1.250 tahmini token (~4.000 karakter)** yapıldı. Bu değişiklikte sadece 382 chunk yeniden embed edildi. Büyük markdown tabloları satır sınırından bölünüyor, başlık satırları her parçada tekrarlanıyor.
 
 ### 1.4 Embedding ve Indexleme (`ingest.py`)
 - Embedding istekleri 32–64'lük batch'lerle gönderilecek. Cache anahtarı `sha256(profil + şablonlanmış text)` olacak. Böylece tekrar çalıştırmada sadece değişen chunk'lar embed edilecek.
@@ -132,7 +132,7 @@ blog-rag/
 3. **Hafif filtre çıkarımı:** sorguda geçen dil/teknoloji adları tag sözlüğüyle eşleştirilecek (ör. "Rust" → `tags: rust` veya `code_langs: rust`). Bu filtre önce *should* (boost) olarak denenecek. Sonuç azsa filtresiz aramaya dönülecek.
 4. Aynı yazıdan gelen çok fazla chunk olmaması için post başına en fazla 3 chunk alınacak, ardından MMR çeşitlendirmesi yapılacak.
 5. Son olarak top-n (n=5–6) chunk context'e verilecek. Context bütçesi Llama 3'ün 8K penceresine göre ~4K token.
-6. Uygulama (Adım 4): Filtre çıkarımı serbest tag eşleştirmesiyle değil, küratörlü bir teknoloji sözlüğüyle yapılıyor (`phase1_vector/query_filters.py`), çünkü blogda `as`, `is`, `get`, `list` gibi tag'ler var. Filtreli ve filtresiz iki arama yapılıp sonuçlar birleştiriliyor, filtreye uyan adaylar +0.05 boost alıyor. Böylece filtre az sonuç verirse filtresiz sonuçlar zaten listede oluyor. Seçim MMR ile yapılıyor (λ=0.7, post başına en fazla 3 chunk, ~3.500 token bütçe).
+6. Uygulama (Adım 4): Filtre çıkarımı serbest tag eşleştirmesiyle değil, küratörlü bir teknoloji sözlüğüyle yapılıyor (`phase1_vector/query_filters.py`), çünkü blogda `as`, `is`, `get`, `list` gibi tag'ler var. Filtreli ve filtresiz iki arama yapılıp sonuçlar birleştiriliyor, filtreye uyan adaylar +0.05 boost alıyor. Böylece filtre az sonuç verirse filtresiz sonuçlar zaten listede oluyor. Seçim MMR ile yapılıyor (λ=0.7, post başına en fazla 3 chunk, ~3.500 token bütçe). İlk denemede seçilen 6 chunk'tan 2'si zayıftı: biri yazının kapanış paragrafıydı, diğeri koda giriş cümlesiydi ve asıl kod sonraki chunk'taydı. Bunun üzerine iki ekleme yapıldı: (a) sorgu kod örneği istiyorsa (örnek/kod/göster/yaz) kod içeren adaylara +0.02 boost, (b) 150 tokendan kısa ve kodsuz seçilen chunk'lara aynı yazıdaki sonraki chunk ekleniyor. İkisi de kapatılabilir (`--no-code-boost`, `--no-expand`), etkileri eval'de ölçülecek.
 7. *(Opsiyonel 1.5b)* Cross-encoder reranker eklenebilir (`bge-reranker-v2-m3`, çok dilli, lokal). Kalite farkı eval ile ölçülecek.
 
 ### 1.6 Üretim (`ask.py`)
@@ -140,6 +140,8 @@ blog-rag/
 - Her context chunk'ı `[#n] {title} ({date}) — {section_path}` başlığıyla verilecek. Cevaptaki atıflar `[#n]` formatında olacak.
 - CLI kullanımı: `uv run python -m phase1_vector.ask "Rust dilinde değişken kullanımları ile ilgili örnekler yaz"` → çıktıda cevap, kullanılan kaynaklar (başlık + blog URL'i) ve `--debug` ile retrieval skorları görünecek.
 - Model `--model` parametresi ile değiştirilebilecek (Llama 3 8B, Qwen3-8B, Gemma-3-12B kıyası için).
+
+- Uygulama (Adım 5): Prompt'lar `common/prompts.py` içinde. Cevap konsola canlı akıyor, kaynak listesinde atıf yapılan parçalar ✓ ile işaretleniyor. Atıf yoksa ya da geçersiz numara varsa uyarı veriliyor. Her soru `data/runs/ask-{tarih}.jsonl` dosyasına kaydediliyor (eval için). `--no-rag` bağlamsız cevap veriyor, kıyas için kullanılıyor.
 
 ### 1.7 Faz 1 Bitti Kriterleri
 - [ ] `docker compose up qdrant` ile Qdrant ayağa kalkıyor, ingest bütün yazıları hatasız indexliyor.
@@ -218,7 +220,7 @@ blog-rag/
 2. ✅ `loader.py` + `chunker.py` → `data/chunks.jsonl` + chunk istatistikleri (dağılım, en uzun chunk'lar)
 3. ✅ `embeddings.py` + `embedding_cache.py` + `ingest.py` → Qdrant'ın dolması
 4. ✅ `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
-5. `ask.py` → uçtan uca cevap
+5. ✅ `ask.py` → uçtan uca cevap
 6. Eval seti + ilk ölçüm. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3).
 
 **Faz 2**

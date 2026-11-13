@@ -50,6 +50,11 @@ TECHNOLOGIES: dict[str, tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]]
 }
 
 APOSTROPHE_SUFFIX_RE = re.compile(r"['’]\w+")
+# Kod örneği isteyen ifadeler. "yazılım", "kodlama" gibi kelimeler eşleşmez.
+CODE_INTENT_RE = re.compile(
+    r"(?<!\w)(örnek\w*|kod(u|un|unu|lar\w*|la|da)?|göster\w*|yaz(ar|ın|abilir\w*)?"
+    r"|example\w*|snippet\w*|implement\w*)(?!\w)"
+)
 
 
 @dataclass
@@ -98,3 +103,8 @@ def detect_filter(query: str) -> QueryFilter:
             result.tags.extend(t for t in tags if t not in result.tags)
             result.code_langs.extend(lang for lang in langs if lang not in result.code_langs)
     return result
+
+
+def detect_code_intent(query: str) -> bool:
+    """Sorgu kod örneği istiyor mu? (örnek, kod, göster, yaz ...)"""
+    return CODE_INTENT_RE.search(normalize_query(query)) is not None

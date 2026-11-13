@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 from openai import OpenAI
 
 from common.config import Settings, get_settings
@@ -31,3 +33,21 @@ class LLM:
             max_tokens=max_tokens,
         )
         return response.choices[0].message.content or ""
+
+    def stream(
+        self,
+        messages: list[dict[str, str]],
+        temperature: float = 0.2,
+        max_tokens: int = 1024,
+    ) -> Iterator[str]:
+        """Cevabı parça parça döner (konsolda canlı göstermek için)."""
+        response = self._client.chat.completions.create(
+            model=self.model,
+            messages=messages,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            stream=True,
+        )
+        for event in response:
+            if event.choices and event.choices[0].delta.content:
+                yield event.choices[0].delta.content

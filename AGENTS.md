@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 / Adım 1 (iskelet), Adım 2 (loader + chunker), Adım 3 (embedding cache + Qdrant ingest) ve Adım 4 (retrieval) tamamlandı. Sıradaki iş *Adım 5: ask.py (uçtan uca cevap)*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 / Adım 1 (iskelet), Adım 2 (loader + chunker), Adım 3 (embedding cache + Qdrant ingest), Adım 4 (retrieval) ve Adım 5 (ask.py) tamamlandı. Sıradaki iş *Adım 6: eval seti + ilk ölçüm*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -48,8 +48,8 @@ uv run python -m scripts.build_chunks        # data/chunks.jsonl + chunk_stats.j
 docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
 uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate, --check-only)
-uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter)
-uv run python -m phase1_vector.ask "soru"    # sor (--debug ile retrieval skorları)
+uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter, --no-code-boost, --no-expand)
+uv run python -m phase1_vector.ask "soru"    # sor (--debug, --show-context, --no-rag, --model X)
 uv run python -m eval.run_eval --phase 1     # değerlendir
 uv run ruff check . && uv run pytest         # lint + test
 ```
@@ -60,4 +60,5 @@ uv run ruff check . && uv run pytest         # lint + test
 - Her adımda çalıştığını gösteren küçük bir doğrulama olmalı: smoke test, istatistik çıktısı ya da örnek sorgu sonucu.
 - LM Studio veya Docker ayakta değilse, bunu taklit eden sahte bir çözüm yazma. Durumu kullanıcıya bildir.
 - Commit mesajları Conventional Commits formatında olmalı (`feat(phase1): ...`, `fix(chunker): ...`, `docs(plan): ...`). Push etmeden önce kullanıcıya sor.
+- AI ajanının hazırladığı commit'lerin son paragrafına imza olarak `Co-Authored-By: <model adı> <noreply@...>` trailer'ı eklenir. Session/oturum linki eklenmez.
 - `data/`, docker volume'ları ve embedding cache'i git'e girmez.

@@ -38,7 +38,9 @@ NON_LANGS = {"", "text", "plaintext", "txt", "console", "output"}
 @dataclass(frozen=True)
 class ChunkerConfig:
     target_tokens: int = 450
-    max_tokens: int = 1500
+    # embeddinggemma 2048 token sınırı: kodlu Türkçe metinde oran ~2,4 karakter/token'a
+    # kadar düşüyor (ingest --check-only). 1250 x 3,2 = ~4.000 karakter güvenli üst sınır.
+    max_tokens: int = 1250
     min_tokens: int = 60
     overlap_tokens: int = 70
     intro_max_tokens: int = 250

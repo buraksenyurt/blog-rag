@@ -87,3 +87,35 @@ def test_mmr_prefers_diverse_chunk() -> None:
     cfg = RetrievalConfig(n=2, use_filter=False, mmr_lambda=0.5)
     ids = [h.payload["id"] for h in Retriever(FakeEmbedder(), client, cfg).retrieve("q").hits]
     assert ids == ["a#0000", "c#0000"]
+
+
+def test_code_boost_prefers_code_chunk_for_example_queries() -> None:
+    client = make_client()
+    add(client, "intro#0000", [1.0, 0.10, 0.0], has_code=False)
+    add(client, "code#0000", [1.0, 0.20, 0.0], has_code=True)
+    retriever = Retriever(FakeEmbedder(), client, RetrievalConfig(n=1, use_filter=False))
+    assert retriever.retrieve("örnek kod yaz").hits[0].payload["id"] == "code#0000"
+    assert retriever.retrieve("bu nedir").hits[0].payload["id"] == "intro#0000"
+
+
+def test_short_textual_hit_is_expanded_with_next_chunk() -> None:
+    client = make_client()
+    add(client, "post#0000", [1.0, 0.0, 0.0], chunk_index=0, n_tokens=60, has_code=False)
+    add(
+        client,
+        "post#0001",
+        [0.0, 1.0, 0.0],
+        chunk_index=1,
+        n_tokens=300,
+        has_code=True,
+        text="```rust\nlet x = 5;\n```",
+    )
+    retriever = Retriever(FakeEmbedder(), client, RetrievalConfig(n=1, use_filter=False))
+    hit = retriever.retrieve("q").hits[0]
+    assert [e["id"] for e in hit.extras] == ["post#0001"]
+    assert "let x = 5;" in hit.text and hit.total_tokens == 360
+
+    no_expand = retriever.retrieve("q", expand_short=False).hits[0]
+    assert no_expand.extras == []
+    tight = retriever.retrieve("q", token_budget=100).hits[0]
+    assert tight.extras == []
