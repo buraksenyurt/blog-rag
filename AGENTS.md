@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 / Adım 1 (iskelet), Adım 2 (loader + chunker), Adım 3 (embedding cache + Qdrant ingest), Adım 4 (retrieval), Adım 5 (ask.py) ve Adım 6 (eval seti + ölçüm aracı) tamamlandı. Sıradaki iş: ilk ölçüm sonuçlarını değerlendirmek, ardından Faz 2. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 / Adım 1 (iskelet), Adım 2 (loader + chunker), Adım 3 (embedding cache + Qdrant ingest), Adım 4 (retrieval), Adım 5 (ask.py) ve Adım 6 (eval seti + ölçüm aracı) tamamlandı. İlk retrieval ölçümü yapıldı, eval seti zor sorularla genişletildi. Sıradaki iş: genişletilmiş setle ölçüm ve LLM kıyası, ardından Faz 2. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -49,8 +49,8 @@ docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
 uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate, --check-only)
 uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter, --no-code-boost, --no-expand)
-uv run python -m phase1_vector.ask "soru"    # sor (--debug, --show-context, --no-rag, --model X)
-uv run python -m eval.run_eval               # retrieval varyant kıyası (--with-llm --limit N ile cevaplar)
+uv run python -m phase1_vector.ask "soru"    # sor (--debug, --show-context, --no-rag, --model X, --n, --budget)
+uv run python -m eval.run_eval               # retrieval varyant kıyası (--with-llm --limit N ile cevaplar, --n/--budget)
 uv run ruff check . && uv run pytest         # lint + test
 ```
 

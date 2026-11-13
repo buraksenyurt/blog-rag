@@ -16,8 +16,9 @@ class LLM:
         self._client = OpenAI(
             base_url=self.settings.lmstudio_url,
             api_key=self.settings.lmstudio_api_key,
-            timeout=300,
-            max_retries=2,
+            timeout=self.settings.llm_timeout,
+            # Uzun bir üretimi zaman aşımında baştan tekrarlamak sadece süreyi katlar.
+            max_retries=0,
         )
 
     def chat(

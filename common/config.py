@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     lmstudio_url: str = "http://localhost:1234/v1"
     lmstudio_api_key: str = "lm-studio"
     llm_model: str = "meta-llama-3-8b-instruct"
+    # Saniye. Yavaş (CPU/iGPU) makinelerde üretim uzun sürebilir; stream ederken
+    # bu süre token'lar arasındaki en uzun bekleme için geçerlidir.
+    llm_timeout: float = 900.0
 
     embedding_profile: str | None = None
     embedding_profiles_file: Path = Path("embedding_profiles.yaml")

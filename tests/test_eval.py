@@ -27,6 +27,7 @@ def test_question_set_is_well_formed() -> None:
     assert len({q["id"] for q in questions}) == len(questions)
     for q in questions:
         assert q["type"] in {"example", "relational", "structural"}
+        assert q.get("difficulty", "normal") in {"normal", "hard"}
         assert q["question"].strip()
         if q["type"] != "structural":
             assert q["relevant"], q["id"]
@@ -71,3 +72,91 @@ def test_run_retrieval_end_to_end_with_fake_store() -> None:
     assert report["summary"]["full"]["mrr"] == 1.0  # filtre boost'u rust yazısını öne alır
     assert report["summary"]["plain"]["mrr"] == 0.5
     assert report["questions"][1]["variants"]["full"]["hit_ctx"] == 0.0
+
+
+def test_question_set_has_hard_questions() -> None:
+    hard = [q for q in load_questions() if q.get("difficulty") == "hard"]
+    assert len(hard) >= 10
+    assert all(q["type"] != "structural" and q["relevant"] for q in hard)
+
+
+class _Hit:
+    def __init__(self, slug: str) -> None:
+        self.payload = {
+            "id": f"{slug}#0000",
+            "title": slug,
+            "date": "2022-01-01",
+            "section_path": "",
+            "text": "metin",
+            "url": "u",
+        }
+        self.post_slug = slug
+        self.extras: list = []
+
+    @property
+    def text(self) -> str:
+        return self.payload["text"]
+
+
+class _Retriever:
+    def retrieve(self, question: str):
+        class Result:
+            hits = [_Hit("beklenen-yazi"), _Hit("diger-yazi")]
+
+        return Result()
+
+
+class _FlakyLLM:
+    """İlk soruda zaman aşımı fırlatır, sonrakilerde stream eder."""
+
+    model = "fake-llm"
+
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def stream(self, messages, temperature=0.2, max_tokens=1024):
+        import openai
+
+        self.calls += 1
+        if self.calls == 1:
+            raise openai.APITimeoutError(request=None)
+        yield "Cevap "
+        yield "[#1]."
+
+    def chat(self, *args, **kwargs):  # run_llm stream kullanmalı
+        raise AssertionError("run_llm chat() yerine stream() kullanmalı")
+
+
+def test_run_llm_continues_after_timeout_and_saves_each_row() -> None:
+    from eval.run_eval import run_llm, summarize_answers
+
+    questions = [
+        {"id": "q1", "type": "example", "question": "a", "relevant": ["beklenen-yazi"]},
+        {"id": "q2", "type": "example", "question": "b", "relevant": ["beklenen-yazi"]},
+    ]
+    saved: list[int] = []
+    rows = run_llm(questions, _Retriever(), _FlakyLLM(), save=lambda r: saved.append(len(r)))
+    assert saved == [1, 2]
+    assert rows[0]["error"].startswith("APITimeoutError") and rows[0]["answer"] == ""
+    assert rows[1]["error"] is None and rows[1]["answer"] == "Cevap [#1]."
+    assert rows[1]["cited"] == [1] and rows[1]["sources"][0]["relevant"] is True
+    assert rows[1]["first_token_seconds"] is not None
+    summary = summarize_answers(rows)
+    assert summary["answered"] == 1 and summary["errors"] == 1 and summary["citation_rate"] == 1.0
+
+
+def test_answers_markdown_marks_errors(tmp_path) -> None:
+    from eval.run_eval import write_answers_markdown
+
+    row = {
+        "id": "q1",
+        "type": "example",
+        "difficulty": "hard",
+        "question": "a",
+        "expected": None,
+        "error": "APITimeoutError: timed out",
+    }
+    path = tmp_path / "a.md"
+    write_answers_markdown([row], path, "m", "p")
+    text = path.read_text(encoding="utf-8")
+    assert "## q1 (example, zor)" in text and "**HATA:** APITimeoutError" in text

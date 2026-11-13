@@ -6,6 +6,8 @@
 # relevant: cevabın asıl kaynağı olması beklenen yazıların slug'ları (post seviyesi).
 #           Retrieval metrikleri bu listeye göre hesaplanır. structural sorularda boş olabilir.
 # expected: structural sorular için beklenen cevap (manuel kontrol için).
+# difficulty: hard -> teknoloji/kavram adı geçmeyen, günlük dille sorulmuş sorular.
+#             Varsayılan "normal". Eval özetinde ayrı raporlanır.
 
 questions:
   # --- Rust ---
@@ -110,6 +112,8 @@ questions:
     question: Parallel.For ile normal for döngüsü arasındaki fark nedir?
     relevant:
       - 2009-06-09-for-mu-foreach-mi-yoksa-parallel-for-mu-parallel-foreach-mi-beta-1
+      - 2009-12-16-forparallelism
+      - 2011-12-02-parallel-programming-reduction
 
   - id: lazy-t
     type: example
@@ -223,6 +227,110 @@ questions:
     relevant:
       - 2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig
       - 2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked
+
+  # --- Zor sorular: teknoloji ya da kavram adı geçmiyor ---
+  - id: hard-moved-value
+    type: example
+    difficulty: hard
+    question: Bir değişkeni fonksiyona verdikten sonra neden tekrar kullanamıyorum?
+    relevant:
+      - 2022-05-22-rust-pratikleri-value-moved-here
+      - 2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak
+
+  - id: hard-lazy-creation
+    type: example
+    difficulty: hard
+    question: Pahalı bir nesneyi ilk gerçekten ihtiyaç duyulana kadar oluşturmamak için hangi yaklaşım kullanılabilir?
+    relevant:
+      - 2009-12-14-net-4-0-lazy-initialization-beta-2
+      - 2010-10-11-tembellik-etmek-istiyorum-generic-lazy-tipi-ile-et
+      - 2010-10-18-generic-lazy-tipi-olmasaydi
+
+  - id: hard-cancel-parallel-work
+    type: example
+    difficulty: hard
+    question: Uzun süren paralel bir işlemi kullanıcı isteğiyle yarıda kesmek istiyorum, ne yapmalıyım?
+    relevant:
+      - 2009-06-08-tpl-iptal-islemi-beta-1
+      - 2009-11-12-task-parallel-library-tpl-iptal-islemi-beta-2
+      - 2011-04-23-task-iptal-islemlerinin-izlenmesi-monitoring-cancellation
+      - 2011-04-26-composite-cancellations
+
+  - id: hard-value-to-object-cost
+    type: example
+    difficulty: hard
+    question: Değer türlerini object tipindeki bir değişkene atamanın performans maliyeti nedir?
+    relevant:
+      - 2003-12-30-boxing-kutulamak-ve-unboxing-kutuyu-kaldirmak
+      - 2005-09-26-boxing-ve-unboxing-performans-kritigi
+
+  - id: hard-recover-from-crash
+    type: example
+    difficulty: hard
+    question: Bir fonksiyon beklenmedik şekilde çöktüğünde programın tamamen kapanmadan toparlanması nasıl sağlanır, kaynaklar nasıl serbest bırakılır?
+    relevant:
+      - 2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim
+
+  - id: hard-lock-free-counter
+    type: example
+    difficulty: hard
+    question: Birden fazla iş parçacığı aynı sayacı artırırken kilit kullanmadan veri tutarlılığı nasıl korunur?
+    relevant:
+      - 2011-01-31-tpl-senkronizasyonu-saglamak-2-interlocked
+      - 2026-02-15-bunu-bir-dene-01-coklu-thread-ortamlarinda-ortak-veriyi-degistirmek-c-rust-ve-zig
+
+  - id: hard-add-methods-to-type
+    type: example
+    difficulty: hard
+    question: Kaynak koduna erişimim olmayan bir tipe, ondan türetme yapmadan yeni metotlar ekleyebilir miyim?
+    relevant:
+      - 2008-03-21-csharp-3-0-derinlemesine-extension-method-kavrami
+      - 2012-06-07-cerezlik-algoritmalar-ve-extension-methodlar
+
+  - id: hard-reference-validity
+    type: example
+    difficulty: hard
+    question: Derleyiciye bir referansın ne kadar süre geçerli kalacağını nasıl anlatırız?
+    relevant:
+      - 2022-03-06-rust-pratikleri-lifetimes-mevzusu
+      - 2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir
+
+  - id: hard-test-email-sending
+    type: example
+    difficulty: hard
+    question: E-posta gönderen bir kodu gerçek bir posta sunucusu olmadan nasıl test edebilirim?
+    relevant:
+      - 2026-09-07-light-mail-server
+
+  - id: hard-tools-for-ai-assistant
+    type: example
+    difficulty: hard
+    question: Bir yapay zeka asistanının kendi yazdığım araçları çağırabilmesi için nasıl bir sunucu geliştirmeliyim?
+    relevant:
+      - 2026-03-07-microsoft-dotnet-platformunda-bir-mcp-server-yazmak
+
+  - id: hard-game-architecture
+    type: relational
+    difficulty: hard
+    question: Oyun geliştirmede veriyi davranıştan ayıran, nesneleri parçalardan oluşturan mimari yaklaşım nedir?
+    relevant:
+      - 2026-09-02-csharp-ecs
+      - 2024-11-06-rust-ile-ecs-yaklasimini-anlamak
+
+  - id: hard-compile-time-marker
+    type: example
+    difficulty: hard
+    question: Bir struct'a, alanlarında hiç kullanmadığı bir tip parametresiyle derleme zamanı bilgisi nasıl eklenir?
+    relevant:
+      - 2026-05-09-rust-phantom-data
+
+  - id: hard-cross-platform-messaging
+    type: relational
+    difficulty: hard
+    question: Farklı platformlarda yazılmış iki uygulama bir mesaj kuyruğu üzerinden nasıl haberleşir?
+    relevant:
+      - 2020-11-23-net-core-tarafindan-rabbitmq-ya-mesaj-gondermek-ve-java-tarafindan-dinlemek
+      - 2018-09-09-west-world-un-rabbitmq-ile-tanismasinin-zamani-gelmisti
 
   # --- Yapısal (Faz 2) ---
   - id: count-rust-posts

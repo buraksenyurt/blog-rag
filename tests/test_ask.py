@@ -85,5 +85,23 @@ def test_answer_question_streaming_and_no_rag() -> None:
     received: list[str] = []
     result = answer_question("soru", llm, None, on_token=received.append)
     assert result.answer == "bağlamsız cevap" and received == ["bağla", "msız cevap"]
+    assert result.first_token_seconds is not None
     assert not result.use_rag and result.hits == []
     assert "BAĞLAM" not in llm.messages[1]["content"]
+
+
+def test_retrieval_config_overrides() -> None:
+    from phase1_vector.ask import retrieval_config
+
+    default = retrieval_config()
+    assert (default.n, default.token_budget) == (6, 3500)
+    small = retrieval_config(n=4, budget=2000)
+    assert (small.n, small.token_budget) == (4, 2000)
+
+
+def test_llm_uses_configured_timeout_without_retries() -> None:
+    from common.config import Settings
+    from common.llm import LLM
+
+    llm = LLM(Settings(_env_file=None, llm_timeout=42))
+    assert llm._client.timeout == 42 and llm._client.max_retries == 0

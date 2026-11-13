@@ -15,9 +15,9 @@ import json
 import sys
 import time
 from collections.abc import Callable
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
-from openai import APIError
+from openai import APIError, APITimeoutError
 from qdrant_client import QdrantClient
 
 from common.config import Settings, ensure_writable, get_settings, load_embedding_profile
@@ -38,6 +38,7 @@ class AskResult:
     invalid_citations: list[int] = field(default_factory=list)
     retrieval_seconds: float = 0.0
     generation_seconds: float = 0.0
+    first_token_seconds: float | None = None  # stream'de ilk token'a kadar geçen süre (prefill)
 
 
 def answer_question(
@@ -58,9 +59,12 @@ def answer_question(
     retrieval_seconds = time.perf_counter() - started
 
     started = time.perf_counter()
+    first_token_seconds: float | None = None
     if on_token is not None:
         parts: list[str] = []
         for part in llm.stream(messages, temperature=temperature, max_tokens=max_tokens):
+            if first_token_seconds is None:
+                first_token_seconds = round(time.perf_counter() - started, 2)
             parts.append(part)
             on_token(part)
         answer = "".join(parts)
@@ -79,6 +83,7 @@ def answer_question(
         invalid_citations=invalid,
         retrieval_seconds=round(retrieval_seconds, 2),
         generation_seconds=round(generation_seconds, 2),
+        first_token_seconds=first_token_seconds,
     )
 
 
@@ -124,9 +129,20 @@ def log_run(result: AskResult, settings: Settings, profile_name: str, cfg: Retri
         "invalid_citations": result.invalid_citations,
         "retrieval_seconds": result.retrieval_seconds,
         "generation_seconds": result.generation_seconds,
+        "first_token_seconds": result.first_token_seconds,
     }
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
+def retrieval_config(n: int | None = None, budget: int | None = None) -> RetrievalConfig:
+    """CLI'dan gelen --n/--budget değerleriyle varsayılan retrieval ayarlarını günceller."""
+    overrides = {}
+    if n is not None:
+        overrides["n"] = n
+    if budget is not None:
+        overrides["token_budget"] = budget
+    return replace(RetrievalConfig(), **overrides)
 
 
 def main() -> int:
@@ -140,12 +156,14 @@ def main() -> int:
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--max-tokens", type=int, default=1024)
     parser.add_argument("--no-stream", action="store_true")
+    parser.add_argument("--n", type=int, help="LLM'e gidecek chunk sayısı (varsayılan 6)")
+    parser.add_argument("--budget", type=int, help="bağlam token bütçesi (varsayılan 3500)")
     args = parser.parse_args()
 
     settings = get_settings()
     profile = load_embedding_profile(settings, args.profile)
     llm = LLM(settings, model=args.model)
-    cfg = RetrievalConfig()
+    cfg = retrieval_config(args.n, args.budget)
     retriever = None
     if not args.no_rag:
         retriever = Retriever(
@@ -167,6 +185,10 @@ def main() -> int:
             max_tokens=args.max_tokens,
             on_token=None if args.no_stream else lambda t: print(t, end="", flush=True),
         )
+    except APITimeoutError:
+        print(f"\nLLM {settings.llm_timeout:.0f} saniyede cevap vermedi (LLM_TIMEOUT).")
+        print("İpucu: daha küçük bir model ya da --budget/--n ile daha kısa bağlam deneyin.")
+        return 1
     except APIError as exc:
         print(f"\nLLM hatası: {exc}")
         print("İpucu: LM Studio'da modelin context length ayarı en az 8192 olmalı.")
@@ -175,7 +197,12 @@ def main() -> int:
     if args.no_stream:
         print(result.answer)
     print_sources(result)
-    print(f"\nSüre: retrieval {result.retrieval_seconds}s, üretim {result.generation_seconds}s")
+    first = f" (ilk token {result.first_token_seconds}s)" if result.first_token_seconds else ""
+    context_tokens = sum(h.total_tokens for h in result.hits)
+    print(
+        f"\nSüre: retrieval {result.retrieval_seconds}s, "
+        f"üretim {result.generation_seconds}s{first} | bağlam ~{context_tokens} token"
+    )
     log_run(result, settings, profile.name, cfg)
     return 0
 

@@ -211,6 +211,9 @@ blog-rag/
 - Retrieval metrikleri: Recall@k, MRR. Cevap kalitesi elle 1–5 puan ile değerlendirilecek, istenirse büyük bir modelle LLM-as-judge da yapılabilir.
 - Bütün sonuçlar `eval/results/{faz}-{model}-{tarih}.json` olarak kaydedilecek.
 - Uygulama (Adım 6): `eval/questions.yaml` dosyasında 35 soru var: 29 example, 3 relational, 3 structural. Beklenen yazılar korpusta aranarak elle eşlendi, tamamı doğrulandı. `eval/run_eval.py` retrieval varyantlarını (`plain`, `filter`, `filter+code`, `full`) aynı sorgu vektörüyle kıyaslıyor. Metrikler post seviyesinde: Hit@ctx, Recall@ctx, MRR@20, Recall@20. `--with-llm` cevapları da üretiyor ve atıf oranı, Türkçe oranı ve süreyi ölçüyor. Manuel 1-5 puanlama için ayrıca bir markdown dosyası yazıyor.
+- İlk ölçüm (2026-11-13, embeddinggemma, 32 soru): `plain` Hit@ctx 0,969 · Recall@ctx 0,891 · MRR 0,892 · Recall@20 0,977. `filter` sonucu birebir aynı çıktı. Kod boost'u MRR'yi 0,888'e düşürdü. Soruların neredeyse hepsi teknoloji adını içerdiği için set tavana yakındı ve varyantları ayırt edemedi. Tek ıskalanan `parallel-for` sorusu bir etiketleme sorunuydu: beklenen listeye `forparallelism` ve `parallel-programming-reduction` yazıları eklendi.
+- Set genişletildi (48 soru): teknoloji ya da kavram adı geçmeyen, günlük dille sorulmuş 13 **zor soru** (`difficulty: hard`) eklendi. Örnek: "Bir değişkeni fonksiyona verdikten sonra neden tekrar kullanamıyorum?" Eval özeti normal ve zor soruları ayrı raporluyor.
+- LLM'li eval'de cevaplar stream ediliyor. Zaman aşımı `LLM_TIMEOUT` ile ayarlanabiliyor (varsayılan 900 sn) ve zaman aşımına düşen üretim tekrar denenmiyor. Hata veren soru kaydedilip geçiliyor, sonuçlar her sorudan sonra dosyaya yazılıyor. Her cevap için ilk token süresi (prefill) ayrıca ölçülüyor. `--n` ve `--budget` ile bağlam küçültülebiliyor.
 
 ---
 
@@ -222,7 +225,7 @@ blog-rag/
 3. ✅ `embeddings.py` + `embedding_cache.py` + `ingest.py` → Qdrant'ın dolması
 4. ✅ `retrieve.py` → örnek soru ile retrieval debug edilecek (henüz LLM yok)
 5. ✅ `ask.py` → uçtan uca cevap
-6. ✅ Eval seti + ölçüm aracı. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3). *(İlk ölçüm sonuçları bekleniyor.)*
+6. ✅ Eval seti + ölçüm aracı, ilk retrieval ölçümü yapıldı. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3).
 
 **Faz 2**
 7. Neo4j compose'a eklenecek + `build_graph.py` (deterministik graph + vector index)
@@ -233,6 +236,7 @@ blog-rag/
 ---
 
 ## 6. Açık Konular / Riskler
+- **Donanım:** Geliştirme makinesinde ayrı bir GPU yok. Intel Iris Xe tümleşik grafik, i7-1255U (15 W, 10 çekirdek) ve 32 GB RAM var. Llama 3 8B ile ~3.000 tokenlik bağlamlı bir cevap ~6 dakika sürüyor, embedding hızı ~2,6 chunk/sn. Model seçiminde ve bağlam boyutunda bu sınır gözetilmeli: 8B'den büyük modeller pratik değil.
 - **Llama 3 8B Türkçe kalitesi:** model kıyası 1.6'da yapılacak. Context penceresi 8K olduğu için context bütçesi sıkı tutulmalı.
 - **Eski yazılar (2003–2012):** ağırlıklı olarak .NET/WCF içeriği var. Zaman filtresi veya tarih ağırlığı gerekebilir, eval sonuçlarına göre karar verilecek.
 - **Embedding süresi:** ~10,5 bin chunk işlenecek. Lokal GPU'da birkaç dakika ile onlarca dakika arasında sürebilir. Cache sayesinde bu maliyet bir kez ödenecek.

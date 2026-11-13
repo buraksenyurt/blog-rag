@@ -20,19 +20,21 @@ import datetime as dt
 import json
 import re
 import sys
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path
 from statistics import mean
 
 import yaml
+from openai import APIError
 from qdrant_client import QdrantClient
 
 from common.config import ROOT, ensure_writable, get_settings, load_embedding_profile
 from common.embeddings import Embedder
 from common.llm import LLM
 from eval.metrics import hit, recall, reciprocal_rank, turkish_ratio, unique_posts
-from phase1_vector.ask import answer_question
-from phase1_vector.retrieve import RetrievalConfig, RetrievalResult, Retriever
+from phase1_vector.ask import answer_question, retrieval_config
+from phase1_vector.retrieve import RetrievalResult, Retriever
 
 QUESTIONS_PATH = ROOT / "eval" / "questions.yaml"
 RESULTS_DIR = ROOT / "eval" / "results"
@@ -85,6 +87,7 @@ def run_retrieval(questions: list[dict], retriever: Retriever, variants: list[st
         entry = {
             "id": q["id"],
             "type": q["type"],
+            "difficulty": q.get("difficulty", "normal"),
             "relevant": q.get("relevant") or [],
             "variants": {},
         }
@@ -106,6 +109,13 @@ def run_retrieval(questions: list[dict], retriever: Retriever, variants: list[st
         for qtype in sorted(RETRIEVAL_TYPES):
             typed = [e["variants"][name] for e in per_question if e["type"] == qtype]
             summary[name][f"hit_ctx[{qtype}]"] = aggregate(typed)["hit_ctx"]
+        for level in ("normal", "hard"):
+            leveled = [
+                e["variants"][name]
+                for e in per_question
+                if e["type"] in RETRIEVAL_TYPES and e["difficulty"] == level
+            ]
+            summary[name][level] = aggregate(leveled)
     return {"summary": summary, "questions": per_question}
 
 
@@ -116,6 +126,17 @@ def print_summary(report: dict, variants: list[str], questions: list[dict]) -> N
     for name in variants:
         s = report["summary"][name]
         print(f"{name:<14}" + "".join(f"{s[m]:>12.3f}" for m in METRICS))
+
+    hard = sum(
+        1 for q in questions if q["type"] in RETRIEVAL_TYPES and q.get("difficulty") == "hard"
+    )
+    if hard:
+        for level, label in (("normal", "Normal sorular"), ("hard", "Zor sorular")):
+            count = n - hard if level == "normal" else hard
+            print(f"\n{label} ({count})")
+            for name in variants:
+                s = report["summary"][name][level]
+                print(f"{name:<14}" + "".join(f"{s[m]:>12.3f}" for m in METRICS))
 
     last = variants[-1]
     misses = [
@@ -130,20 +151,43 @@ def print_summary(report: dict, variants: list[str], questions: list[dict]) -> N
             print(f"  - {e['id']}: ilk adaylar -> {top}")
 
 
-def run_llm(questions: list[dict], retriever: Retriever, llm: LLM) -> list[dict]:
+def run_llm(
+    questions: list[dict],
+    retriever: Retriever,
+    llm: LLM,
+    save: Callable[[list[dict]], None] | None = None,
+) -> list[dict]:
+    """Soruları LLM ile cevaplar. Cevaplar stream edilir (zaman aşımı token'lar arası
+    beklemeye uygulanır), hata veren soru kaydedilip geçilir ve her sorudan sonra
+    `save` çağrılır; yarıda kesilen çalıştırmada da elde edilen cevaplar kaybolmaz."""
     rows: list[dict] = []
     for i, q in enumerate(questions, start=1):
-        print(f"  [{i}/{len(questions)}] {q['id']} ...", flush=True)
-        result = answer_question(q["question"], llm, retriever)
+        print(f"  [{i}/{len(questions)}] {q['id']} ...", end="", flush=True)
         relevant = set(q.get("relevant") or [])
-        rows.append(
-            {
-                "id": q["id"],
-                "type": q["type"],
-                "question": q["question"],
-                "expected": q.get("expected"),
-                "answer": result.answer,
-                "sources": [
+        row = {
+            "id": q["id"],
+            "type": q["type"],
+            "difficulty": q.get("difficulty", "normal"),
+            "question": q["question"],
+            "expected": q.get("expected"),
+            "answer": "",
+            "sources": [],
+            "cited": [],
+            "invalid_citations": [],
+            "turkish_ratio": None,
+            "generation_seconds": None,
+            "first_token_seconds": None,
+            "error": None,
+        }
+        try:
+            result = answer_question(q["question"], llm, retriever, on_token=lambda _t: None)
+        except APIError as exc:
+            row["error"] = f"{type(exc).__name__}: {exc}"
+            print(f" HATA ({type(exc).__name__})", flush=True)
+        else:
+            row.update(
+                answer=result.answer,
+                sources=[
                     {
                         "n": n,
                         "id": h.payload["id"],
@@ -154,13 +198,35 @@ def run_llm(questions: list[dict], retriever: Retriever, llm: LLM) -> list[dict]
                     }
                     for n, h in enumerate(result.hits, start=1)
                 ],
-                "cited": result.cited,
-                "invalid_citations": result.invalid_citations,
-                "turkish_ratio": turkish_ratio(result.answer),
-                "generation_seconds": result.generation_seconds,
-            }
-        )
+                cited=result.cited,
+                invalid_citations=result.invalid_citations,
+                turkish_ratio=turkish_ratio(result.answer),
+                generation_seconds=result.generation_seconds,
+                first_token_seconds=result.first_token_seconds,
+            )
+            print(
+                f" {result.generation_seconds:.0f}s (ilk token {result.first_token_seconds}s), "
+                f"atıf: {result.cited or 'yok'}",
+                flush=True,
+            )
+        rows.append(row)
+        if save is not None:
+            save(rows)
     return rows
+
+
+def summarize_answers(rows: list[dict]) -> dict:
+    ok = [r for r in rows if not r["error"]]
+    tr = [r["turkish_ratio"] for r in ok if r["turkish_ratio"] is not None]
+    first = [r["first_token_seconds"] for r in ok if r["first_token_seconds"] is not None]
+    return {
+        "answered": len(ok),
+        "errors": len(rows) - len(ok),
+        "citation_rate": round(mean(1.0 if r["cited"] else 0.0 for r in ok), 2) if ok else 0.0,
+        "turkish_ratio": round(mean(tr), 2) if tr else None,
+        "generation_seconds": round(mean(r["generation_seconds"] for r in ok), 1) if ok else None,
+        "first_token_seconds": round(mean(first), 1) if first else None,
+    }
 
 
 def write_answers_markdown(rows: list[dict], path: Path, model: str, profile: str) -> None:
@@ -171,9 +237,15 @@ def write_answers_markdown(rows: list[dict], path: Path, model: str, profile: st
         "",
     ]
     for row in rows:
-        lines += [f"## {row['id']} ({row['type']})", "", f"**Soru:** {row['question']}", ""]
+        title = f"## {row['id']} ({row['type']}" + (
+            ", zor)" if row.get("difficulty") == "hard" else ")"
+        )
+        lines += [title, "", f"**Soru:** {row['question']}", ""]
         if row["expected"]:
             lines += [f"**Beklenen:** {row['expected']}", ""]
+        if row["error"]:
+            lines += [f"**HATA:** {row['error']}", "", "---", ""]
+            continue
         lines += [row["answer"].strip(), "", "**Kaynaklar:**", ""]
         for s in row["sources"]:
             flags = ("✓atıf " if s["cited"] else "") + ("★beklenen" if s["relevant"] else "")
@@ -181,7 +253,7 @@ def write_answers_markdown(rows: list[dict], path: Path, model: str, profile: st
         lines += [
             "",
             f"Atıf: {row['cited'] or 'yok'} · Türkçe oranı: {row['turkish_ratio']} · "
-            f"Süre: {row['generation_seconds']}s",
+            f"Süre: {row['generation_seconds']}s (ilk token {row['first_token_seconds']}s)",
             "",
             "**Puan (1-5):** ",
             "",
@@ -203,6 +275,8 @@ def main() -> int:
     parser.add_argument("--with-llm", action="store_true", help="LLM cevaplarını da üret")
     parser.add_argument("--model", help="LLM modeli (varsayılan .env LLM_MODEL)")
     parser.add_argument("--limit", type=int, help="LLM ile cevaplanacak soru sayısı")
+    parser.add_argument("--n", type=int, help="LLM'e gidecek chunk sayısı (varsayılan 6)")
+    parser.add_argument("--budget", type=int, help="bağlam token bütçesi (varsayılan 3500)")
     args = parser.parse_args()
 
     variants = [v.strip() for v in args.variants.split(",") if v.strip()]
@@ -218,7 +292,9 @@ def main() -> int:
         questions = [q for q in questions if q["id"] in wanted]
 
     retriever = Retriever(
-        Embedder(settings, profile), QdrantClient(url=settings.qdrant_url, timeout=30)
+        Embedder(settings, profile),
+        QdrantClient(url=settings.qdrant_url, timeout=30),
+        retrieval_config(args.n, args.budget),
     )
     out_dir = ensure_writable(RESULTS_DIR, settings)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -234,7 +310,7 @@ def main() -> int:
                 "phase": 1,
                 "embedding_profile": profile.name,
                 "created": run_stamp,
-                "retrieval_defaults": asdict(RetrievalConfig()),
+                "retrieval_config": asdict(retriever.config),
                 "variants": {v: VARIANTS[v] for v in variants},
                 **report,
             },
@@ -249,18 +325,28 @@ def main() -> int:
         llm = LLM(settings, model=args.model)
         selected = questions[: args.limit] if args.limit else questions
         print(f"\nLLM cevapları: {llm.model}, {len(selected)} soru (varyant: full)\n")
-        rows = run_llm(selected, retriever, llm)
         base = out_dir / f"phase1-answers-{slugify(llm.model)}-{run_stamp}"
-        base.with_suffix(".json").write_text(
-            json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-        write_answers_markdown(rows, base.with_suffix(".md"), llm.model, profile.name)
-        cited = mean(1.0 if r["cited"] else 0.0 for r in rows)
-        tr = [r["turkish_ratio"] for r in rows if r["turkish_ratio"] is not None]
+
+        def save(rows: list[dict]) -> None:
+            payload = {
+                "model": llm.model,
+                "embedding_profile": profile.name,
+                "retrieval_config": asdict(retriever.config),
+                "summary": summarize_answers(rows),
+                "answers": rows,
+            }
+            base.with_suffix(".json").write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            write_answers_markdown(rows, base.with_suffix(".md"), llm.model, profile.name)
+
+        rows = run_llm(selected, retriever, llm, save=save)
+        summary = summarize_answers(rows)
         print(
-            f"\nAtıf yapan cevap oranı: {cited:.2f} | ortalama Türkçe oranı: "
-            f"{mean(tr) if tr else 0:.2f} | ortalama süre: "
-            f"{mean(r['generation_seconds'] for r in rows):.0f}s"
+            f"\nCevaplanan: {summary['answered']}/{len(rows)} | atıf yapan: "
+            f"{summary['citation_rate']:.2f} | Türkçe oranı: {summary['turkish_ratio']} | "
+            f"ort. süre: {summary['generation_seconds']}s "
+            f"(ilk token {summary['first_token_seconds']}s)"
         )
         print(f"-> {base.with_suffix('.md')}  (puanlama için)")
     return 0
