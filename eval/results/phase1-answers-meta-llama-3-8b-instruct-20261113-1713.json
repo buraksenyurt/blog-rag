@@ -1,0 +1,175 @@
+{
+  "model": "meta-llama-3-8b-instruct",
+  "embedding_profile": "embeddinggemma",
+  "retrieval_config": {
+    "k": 20,
+    "n": 4,
+    "use_filter": true,
+    "boost": 0.05,
+    "max_per_post": 3,
+    "mmr_lambda": 0.7,
+    "token_budget": 2000,
+    "code_boost": 0.02,
+    "expand_short": true,
+    "short_tokens": 150
+  },
+  "summary": {
+    "answered": 3,
+    "errors": 0,
+    "citation_rate": 0.33,
+    "turkish_ratio": 0.98,
+    "generation_seconds": 240.7,
+    "first_token_seconds": 51.3
+  },
+  "answers": [
+    {
+      "id": "rust-variables",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust dilinde değişken kullanımları ile ilgili örnekler yaz.",
+      "expected": null,
+      "answer": "Rust dilinde değişken kullanımlarıyla ilgili örnekler yazalım.\n\nRust, varsayılan olarak immutable borrow işlemi yapar. Bu nedenle, bir değişkenin değerini değiştirmek istiyorsak, mutable borrowing kullanmamız gerekir. Aşağıdaki örnek, mutable borrowing kullanımını gösterir:\n\n```rust\nfn main() {\n    let mut intro: String = String::from(\"Wellcome to the jungle!\");\n    get_count(&mut intro);\n    println!(\"{}\", intro);\n}\n\nfn get_count(text: &mut String) -> usize {\n    let count = text.len();\n    text.push('?'.chars().next().unwrap());\n    println!(\" '{}' cümlesindeki karakter sayısı {}\", text, count);\n    count\n}\n```\n\nBu örnek, `intro` değişkenini mutable olarak değiştirir ve `get_count` fonksiyonunda değiştirilir.\n\nDiğer bir örnek, stack bellek bölgesinde duran veri türlerini ele alalım. Aşağıdaki kod, integer değeri 5'i print_ number fonksiyonuna gönderir:\n\n```rust\nfn main() {\n    let score = 5_i8;\n    print_number(score);\n    println!(\"{}\", score);\n}\n\nfn print_number(point: i8) {\n    println!(\"{}\", point);\n}\n```\n\nBu örnek, `score` değişkenini integer olarak değiştirmez ve `print_number` fonksiyonunda değiştirilir.\n\nSon olarak, Rust dilinde null/nil bulunmuyor. O yüzden Option ve Result türlerinin önemi daha da artıyor. Aşağıdaki kod, Rust dilinde null/nil kullanımını gösterir:\n\n```rust\nfn main() {\n    let maybe_string: Option<String> = Some(\"Hello\".to_string());\n    match maybe_string {\n        Some(s) => println!(\"{}\", s),\n        None => println!(\"No string\"),\n    }\n}\n```\n\nBu örnek, `maybe_string` değişkenini Option türünde değiştirir ve match statement kullanarak değerini kontrol eder.\n\nKaynak: [1], [2], [3]",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0034",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak#0006",
+          "title": "Rust Pratikleri - Değişkenleri Kopyalayarak veya Referans Olarak Taşımak",
+          "url": "https://buraksenyurt.github.io/2022/04/17/rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2021-12-24-programcidan-programciya-rust#0025",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 305.26,
+      "first_token_seconds": 60.06,
+      "error": null
+    },
+    {
+      "id": "rust-shadowing",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta shadowing nedir, örnekle açıklar mısın?",
+      "expected": null,
+      "answer": "Soruları cevaplayan bir asistansım.\n\n1. Soru: Rust'ta sahiplik referans usulü ile ödünç alma nedir?\n\nCevap: Bağlamda bahsedilen kod parçasında, inner isimli değişken outer isimli değişkenin değerini ödünç alır. Bu durum sahiplik referans usulü ile ödünç alma olarak adlandırılır. Outer isimli değişken, inner isimli değişkenin değerini saklar ve onu bellekten düşürmez. [#1]\n\n2. Soru: Rust'ta PhantomData nedir?\n\nCevap: Bağlamda bahsedilen kod parçasında, `PhantomData<Render>` kullanarak bir bileşenin hangi ortam için olduğunu derleme zamanında belirtiyoruz. Bu durum PhantomData olarak adlandırılır ve çalışma zamanında saklanmaz. [#2]\n\n3. Soru: Rust'ta OOP nedir?\n\nCevap: Bağlamda bahsedilen kod parçasında, bir oyun sahasındaki robotunu modellemeye çalışıyoruz. Bu sınıfının iki public ve bir de private özelliği var. Auto-Property şeklinde tanımlandıklarından get ve set blokları dotnet tarafından ara kodda otomatik olarak tamamlanıyor. Parametreler ile overload edilmiş bir yapıcı metot da var (constructor). Ayrıca Walk ve LoadFuel isimli deneysel fonksiyonlara sahip. Object sınıfından gelen ToString metotu bu sınıf için yeniden yazılmış durumda (override). [#3]\n\n4. Soru: Rust'ta shadowing nedir?\n\nCevap: Bağlamda bahsedilen kod parçasında, shadowing olarak adlandırılan durum, bir değişkenin aynı isimde başka bir değişken tarafından örtülmesi olarak tanımlanır. Örneğin, outer isimli değişkenin değerini inner isimli değişken ödünç alır ve sonra outer isimli değişkenin değerini saklar. Bu durum shadowing olarak adlandırılır. [#4]",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0037",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": true
+        },
+        {
+          "n": 2,
+          "id": "2026-05-09-rust-phantom-data#0006",
+          "title": "Rust Dilinde Phantom Type Kullanımı: PhantomData",
+          "url": "https://buraksenyurt.github.io/2026/05/09/rust-phantom-data/",
+          "relevant": false,
+          "cited": true
+        },
+        {
+          "n": 3,
+          "id": "2022-04-24-rust-pratikleri-oop#0002",
+          "title": "Rust Pratikleri - OOP",
+          "url": "https://buraksenyurt.github.io/2022/04/24/rust-pratikleri-oop/",
+          "relevant": false,
+          "cited": true
+        },
+        {
+          "n": 4,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": true
+        }
+      ],
+      "cited": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 245.17,
+      "first_token_seconds": 57.06,
+      "error": null
+    },
+    {
+      "id": "rust-lifetimes",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta lifetime kavramı neden gereklidir?",
+      "expected": null,
+      "answer": "Rust'ta lifetime kavramı, bellek yönetimini sağlamak için kullanılan bir konsepttir. Rust derleyicisi, çalışma zamanının mümkün olduğunca az değişkenle uğraşmasını ve referansların gereksiz yere yaşamamasını tercih eder. Lifetime parametreleri, nesnelerin kullanım sürelerini belirlemek için kullanılır.\n\nRust'ta lifetime kavramı, ownership ve borrowing kurallarıyla birlikte çalışır. Ownership, bir değerin kimin mülkiyetinde olduğunu belirlerken, borrowing, bir değerin başka bir değene erişimini sağlar. Lifetime parametreleri, bu kuralların uygulanmasını sağlar.\n\nÖrnek olarak, bir String'i oluşturduğumuzda, derleyici o String'in kullanım süresini belirlemek için lifetime parametrelerini kullanır. Eğer String'i başka bir yerde kullanılmak istenirse, derleyici o String'in kullanım süresini uzatmak için lifetime parametrelerini değiştirir.\n\nLifetime parametreleri, Rust'ta güvenli bellek yönetimini sağlar. Bellek yönetimi, programın çalışması sırasında bellekteki veri alanlarını yönetmek için kullanılır. Lifetime parametreleri, bellekteki veri alanlarının kullanım sürelerini belirlemek için kullanılır.\n\nYukarıdaki bağlamda, Player struct'i oluşturulurken, lifetime parametreleri kullanılmıştır. Bu, Player struct'i oluşturan fonksiyonların kullanım süresini belirlemek için kullanılır. Eğer Player struct'i başka bir yerde kullanılmak istenirse, derleyici o Player struct'i kullanım süresini uzatmak için lifetime parametrelerini değiştirir.\n\nSonuç olarak, Rust'ta lifetime kavramı, bellek yönetimini sağlamak için kullanılan bir konsepttir. Lifetime parametreleri, nesnelerin kullanım sürelerini belirlemek için kullanılır ve Rust'ta güvenli bellek yönetimini sağlar.",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0040",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0000",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0009",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0007",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": 0.94,
+      "generation_seconds": 171.67,
+      "first_token_seconds": 36.73,
+      "error": null
+    }
+  ]
+}
