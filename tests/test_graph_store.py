@@ -96,3 +96,19 @@ def test_delete_stale_repeats_until_nothing_left() -> None:
         }
     )
     assert delete_stale(run, data) == {"chunks": 10003, "posts": 2, "orphans": 5}
+
+
+def test_vector_index_quantization_is_disabled_by_default() -> None:
+    assert "`vector.quantization.enabled`: false" in vector_index_query(768)
+    assert "`vector.quantization.enabled`: true" in vector_index_query(768, quantization=True)
+
+
+def test_rebuild_vector_index_drops_creates_and_waits() -> None:
+    from phase2_graph.store import rebuild_vector_index
+
+    run = FakeRunner()
+    rebuild_vector_index(run, PROFILE, quantization=False)
+    queries = [q for q, _ in run.calls]
+    assert queries[0].startswith("DROP INDEX chunk_embedding")
+    assert queries[1].startswith("CREATE VECTOR INDEX") and "enabled`: false" in queries[1]
+    assert "awaitIndexes" in queries[2]

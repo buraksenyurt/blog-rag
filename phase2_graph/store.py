@@ -130,14 +130,39 @@ def make_runner(driver: Driver, database: str) -> Runner:
     return run
 
 
-def vector_index_query(dim: int) -> str:
+def vector_index_query(dim: int, quantization: bool = False) -> str:
+    """Vector index tanımı.
+
+    Quantization varsayılan olarak kapalı: embeddinggemma skorları çok dar bir aralıkta
+    (ör. 0,73-0,77) toplandığı için sıkıştırmanın getirdiği küçük sapmalar sıralamayı
+    değiştirebiliyor. 10 bin chunk için tam hassasiyetin bellek maliyeti önemsiz.
+    """
     if not isinstance(dim, int) or dim <= 0:
         raise ValueError(f"geçersiz vektör boyutu: {dim}")
     return (
         f"CREATE VECTOR INDEX {VECTOR_INDEX} IF NOT EXISTS FOR (c:Chunk) ON (c.embedding) "
         f"OPTIONS {{indexConfig: {{`vector.dimensions`: {dim}, "
-        f"`vector.similarity_function`: 'cosine'}}}}"
+        f"`vector.similarity_function`: 'cosine', "
+        f"`vector.quantization.enabled`: {str(quantization).lower()}}}}}"
     )
+
+
+def vector_index_options(run: Runner) -> dict | None:
+    rows = run(
+        "SHOW INDEXES YIELD name, options, state WHERE name = $name RETURN options, state",
+        name=VECTOR_INDEX,
+    )
+    if not rows:
+        return None
+    config = (rows[0]["options"] or {}).get("indexConfig", {})
+    return {"state": rows[0]["state"], **config}
+
+
+def rebuild_vector_index(run: Runner, profile: EmbeddingProfile, quantization: bool) -> None:
+    """Veriye dokunmadan vector index'i silip yeniden kurar ve hazır olmasını bekler."""
+    run(f"DROP INDEX {VECTOR_INDEX} IF EXISTS")
+    run(vector_index_query(profile.dim, quantization))
+    run("CALL db.awaitIndexes(1800)")
 
 
 def check_meta(run: Runner, profile: EmbeddingProfile) -> None:
@@ -153,10 +178,10 @@ def check_meta(run: Runner, profile: EmbeddingProfile) -> None:
         )
 
 
-def ensure_schema(run: Runner, profile: EmbeddingProfile) -> None:
+def ensure_schema(run: Runner, profile: EmbeddingProfile, quantization: bool = False) -> None:
     for query in CONSTRAINTS:
         run(query)
-    run(vector_index_query(profile.dim))
+    run(vector_index_query(profile.dim, quantization))
 
 
 def write_posts(run: Runner, data: GraphData) -> None:

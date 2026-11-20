@@ -7,6 +7,7 @@ Kullanım:
     docker compose up -d neo4j
     uv run python -m phase2_graph.build_graph
     uv run python -m phase2_graph.build_graph --recreate      # graph'ı silip baştan kur
+    uv run python -m phase2_graph.build_graph --rebuild-index # sadece vector index'i yeniden kur
 """
 
 from __future__ import annotations
@@ -28,6 +29,8 @@ from phase2_graph.store import (
     delete_stale,
     ensure_schema,
     make_runner,
+    rebuild_vector_index,
+    vector_index_options,
     wipe,
     write_chunks,
     write_meta,
@@ -88,6 +91,16 @@ def main() -> int:
     parser.add_argument("--profile", help="embedding profili (varsayılan aktif profil)")
     parser.add_argument("--recreate", action="store_true", help="graph'ı silip baştan kur")
     parser.add_argument(
+        "--rebuild-index",
+        action="store_true",
+        help="veriye dokunmadan sadece vector index'i silip yeniden kur",
+    )
+    parser.add_argument(
+        "--quantization",
+        action="store_true",
+        help="vector index'te quantization'ı aç (varsayılan kapalı)",
+    )
+    parser.add_argument(
         "--no-embed", action="store_true", help="cache'te olmayan vektör varsa embed etme, dur"
     )
     args = parser.parse_args()
@@ -134,12 +147,24 @@ def main() -> int:
 
     driver = connect(settings)
     run = make_runner(driver, settings.neo4j_database)
+    if args.rebuild_index:
+        try:
+            print(f"Önceki index: {vector_index_options(run)}")
+            print("Vector index yeniden kuruluyor (veri yeniden yazılmıyor)...")
+            rebuild_vector_index(run, profile, args.quantization)
+            print(f"Yeni index  : {vector_index_options(run)}")
+            verify(run)
+        finally:
+            cache.close()
+            driver.close()
+        print(f"\nSüre: {time.perf_counter() - started:.0f}s")
+        return 0
     try:
         if args.recreate:
             print("Graph siliniyor...")
             wipe(driver, settings.neo4j_database)
         check_meta(run, profile)
-        ensure_schema(run, profile)
+        ensure_schema(run, profile, args.quantization)
         print("Yazılar, tag'ler, kategoriler, seriler ve linkler yazılıyor...")
         write_posts(run, data)
         print("Chunk'lar ve vektörler yazılıyor...")
@@ -153,6 +178,7 @@ def main() -> int:
             f"boşta kalan düğüm {removed['orphans']}"
         )
         print_counts(run)
+        print(f"Vector index: {vector_index_options(run)}")
         verify(run)
     finally:
         cache.close()

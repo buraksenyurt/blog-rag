@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
+from common.answering import answer_question
 from common.prompts import SYSTEM_PROMPT, build_messages, extract_citations, format_context
-from phase1_vector.ask import answer_question
 
 
 @dataclass
@@ -91,7 +91,7 @@ def test_answer_question_streaming_and_no_rag() -> None:
 
 
 def test_retrieval_config_overrides() -> None:
-    from phase1_vector.ask import retrieval_config
+    from common.answering import retrieval_config
 
     default = retrieval_config()
     assert (default.n, default.token_budget) == (6, 3500)

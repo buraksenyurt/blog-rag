@@ -17,7 +17,9 @@ kalabilir.
 4. Kod örneği istenirse bağlamdaki kodları temel al. Gerekirse kısaltıp sadeleştir ve kod \
 bloklarını dil adıyla işaretle (```rust gibi).
 5. Bağlamdan aldığın her bilgi için cümlenin sonunda [#n] biçiminde kaynak numarası ver.
-6. Cevabın sonuna kaynak listesi yazma, kaynaklar ayrıca gösterilecek."""
+6. Cevabın sonuna kaynak listesi yazma, kaynaklar ayrıca gösterilecek.
+7. BAĞLAM'da GRAPH BİLGİSİ bölümü varsa oradaki sayılar ve listeler blog veritabanından \
+alınmış kesin sonuçlardır. Sayma ve listeleme sorularında bunları aynen kullan."""
 
 USER_TEMPLATE = """BAĞLAM:
 {context}
@@ -44,17 +46,25 @@ def format_context(items: Sequence[ContextItem]) -> str:
     for number, item in enumerate(items, start=1):
         p = item.payload
         section = p.get("section_path") or "Giriş"
-        blocks.append(f"[#{number}] {p['title']} ({p['date']}) — {section}\n{item.text}")
+        note = f" ({p['context_note']})" if p.get("context_note") else ""
+        blocks.append(f"[#{number}] {p['title']} ({p['date']}) — {section}{note}\n{item.text}")
     return "\n\n---\n\n".join(blocks)
 
 
-def build_messages(question: str, items: Sequence[ContextItem]) -> list[dict[str, str]]:
+def format_facts(facts: Sequence[str]) -> str:
+    lines = "\n".join(f"- {fact}" for fact in facts)
+    return f"GRAPH BİLGİSİ (blog veritabanından kesin sonuçlar):\n{lines}"
+
+
+def build_messages(
+    question: str, items: Sequence[ContextItem], facts: Sequence[str] | None = None
+) -> list[dict[str, str]]:
+    context = format_context(items)
+    if facts:
+        context = f"{format_facts(facts)}\n\n---\n\n{context}" if items else format_facts(facts)
     return [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {
-            "role": "user",
-            "content": USER_TEMPLATE.format(context=format_context(items), question=question),
-        },
+        {"role": "user", "content": USER_TEMPLATE.format(context=context, question=question)},
     ]
 
 

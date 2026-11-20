@@ -1,6 +1,6 @@
 import pytest
 
-from phase1_vector.query_filters import detect_filter, normalize_query
+from common.query_filters import detect_filter, normalize_query
 
 
 @pytest.mark.parametrize(
@@ -55,6 +55,6 @@ def test_normalize_query() -> None:
     ],
 )
 def test_code_intent(query: str, expected: bool) -> None:
-    from phase1_vector.query_filters import detect_code_intent
+    from common.query_filters import detect_code_intent
 
     assert detect_code_intent(query) is expected

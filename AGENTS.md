@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 tamamlandı (Adım 1–6, eval seti 48 soru). Faz 1 için küçük LLM kıyası (gemma-3-4b-it-qat, qwen3-4b-2507) bekliyor. Faz 2 / Adım 7 (Neo4j + deterministik graph) tamamlandı. Sıradaki iş *Adım 8: graph retrieval + ask*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 tamamlandı (Adım 1–6, eval seti 48 soru). Faz 1 için küçük LLM kıyası (gemma-3-4b-it-qat, qwen3-4b-2507) bekliyor. Faz 2 / Adım 7 (Neo4j + deterministik graph) ve Adım 8 (graph retrieval + yapısal sorular + ask) tamamlandı. Sıradaki iş: Faz 2 ölçümü (`eval.run_eval --phase 2`), ardından Adım 9 (kavram çıkarımı pilotu). Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -32,7 +32,7 @@ Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 - Python 3.12, paket yönetimi için `uv` (`uv add`, `uv run`). `pip install` kullanılmaz.
 - Ayarlar `pydantic-settings` ile `.env` dosyasından okunur. Kod içinde sabit URL ya da model adı olmaz.
 - Kod tanımlayıcıları İngilizce olur. Dokümantasyon, kullanıcıya dönen mesajlar ve LLM prompt'ları Türkçe olur.
-- Modüller `common/`, `phase1_vector/`, `phase2_graph/` ve `eval/` altında yer alır. Faz modülleri ortak kodu `common/` üzerinden kullanır, birbirini import etmez.
+- Modüller `common/`, `phase1_vector/`, `phase2_graph/` ve `eval/` altında yer alır. Faz modülleri ortak kodu (retrieval, answering, prompts, query_filters, chunk_store) `common/` üzerinden kullanır, birbirini import etmez. Yalnızca `eval/` iki fazı birlikte import edebilir.
 - Ingest işlemleri idempotent olmalı: deterministik ID'ler ve embedding cache kullanılır. Bir ingest'i tekrar çalıştırmak veriyi çoğaltmamalı.
 - Chunking sırasında markdown kod blokları asla ortadan bölünmez.
 
@@ -48,6 +48,9 @@ uv run python -m scripts.build_chunks        # data/chunks.jsonl + chunk_stats.j
 docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
 uv run python -m phase2_graph.build_graph    # Neo4j graph'ı kur (vektörler cache'ten, --recreate)
+uv run python -m phase2_graph.retrieve "soru" # graph retrieval, LLM yok (--no-graph, --no-structural)
+uv run python -m phase2_graph.ask "soru"      # Faz 2 cevap (--debug, --model X, --n, --budget)
+uv run python -m eval.run_eval --phase 2     # Faz 2 varyant kıyası (vector / graph / full)
 uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate, --check-only)
 uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter, --no-code-boost, --no-expand)
 uv run python -m phase1_vector.ask "soru"    # sor (--debug, --show-context, --no-rag, --model X, --n, --budget)

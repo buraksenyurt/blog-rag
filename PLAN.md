@@ -201,6 +201,21 @@ blog-rag/
 4. Skorlama: `vektör skoru + graph bonusu` (paylaşılan tag/kavram sayısı, link mesafesi). Sonra Faz 1'deki ile aynı top-n seçimi yapılacak.
 5. LLM'e giden context'e ilişki bilgisi de eklenecek. Örnek: "Bu chunk *Rust Değişkenler* yazısının devamı", "Bu yazı X'e link veriyor".
 
+- Uygulama (Adım 8): `phase2_graph/retrieve.py`, `structural.py`, `ask.py`.
+  - Adaylar Faz 1'in karşılığı olacak şekilde üretiliyor. Vector index'ten top-k alınıyor. Teknoloji filtresi varsa ilgili tag ve kod dili altındaki chunk'lar arasında tam cosine araması yapılıyor (`vector.similarity.cosine`).
+  - Neo4j cosine skorunu (1+cos)/2 aralığında döndürüyor. Skorlar cos'a çevriliyor, böylece Faz 1 ile aynı ölçekte kalıyor ve aynı boost'lar geçerli oluyor.
+  - Graph genişletmesi: en iyi 3 aday yazının `LINKS_TO` ve seri komşularından en alakalı chunk'lar aday havuzuna ekleniyor. En fazla 4 yazı ekleniyor ve her biri +0.02 alıyor. Bu adayların graph'tan gelme nedeni tabloda görünüyor.
+  - Kısa chunk genişletmesi `NEXT` ilişkisiyle yapılıyor. Seriye ait chunk'ların bağlam başlığına "X serisi, n. yazı" notu ekleniyor.
+  - Yapısal sorular kural tabanlı tespit ediliyor: sayma ("kaç yazı"), yıllara göre dağılım, listeleme ve seri (sorunun "seri" kelimesini içermesi gerekiyor). Cevap Cypher şablonlarıyla hesaplanıyor ve LLM'e "GRAPH BİLGİSİ" bloğu olarak veriliyor. Sistem prompt'una bu sayıların kesin olduğunu söyleyen bir kural eklendi.
+  - Ortak kod `common/` altına taşındı: `retrieval.py` (aday yapısı, boost'lar, MMR, kısa chunk genişletmesi), `answering.py` (soru-cevap akışı) ve `query_filters.py`. Böylece iki faz arasındaki fark yalnızca aday üretimi, graph genişletmesi ve yapısal sorgulardan geliyor.
+  - `eval.run_eval --phase 2` dört varyantı kıyaslıyor: `vector`, `exact` (index'siz tam cosine), `graph` (genişletme) ve `full` (genişletme + yapısal). Yapısal sorular için beklenen cevaptaki bütün sayıların graph bilgisinde geçip geçmediği kontrol ediliyor.
+  - İlk Faz 2 ölçümü (2026-11-20, 48 soru):
+    - `full` üç yapısal sorunun üçünü de doğru cevapladı. Seri sorusunda recall 0,13'ten 1,00'e çıktı.
+    - Graph genişletmesi zor sorularda Recall@ctx'i 0,513'ten 0,551'e, Recall@20'yi 0,596'dan 0,635'e çıkardı. Normal sorularda etkisi küçük (+0,008).
+    - Beklenmedik bulgu: Faz 2'nin `vector` varyantı aynı embedding'lerle Faz 1'den kötü çıktı (zor sorularda Hit@ctx 0,692'ye karşı 0,846, Recall@20 0,596'ya karşı 0,712).
+    - Şüphe: Neo4j vector index'i varsayılan olarak quantization kullanıyor (kendi vektörüyle arama skoru 0,9988). embeddinggemma skorları dar bir aralıkta toplandığı için küçük sapmalar sıralamayı değiştiriyor olabilir.
+    - Bunu sınamak için iki şey eklendi: index'siz `exact` varyantı ve index'i quantization kapalı yeniden kuran `build_graph --rebuild-index` seçeneği. Index artık varsayılan olarak quantization kapalı kuruluyor.
+
 ### 2.6 Faz 2 Bitti Kriterleri
 - [ ] Graph Neo4j Browser'da gezilebiliyor (Post–Tag–Chunk ilişkileri görünüyor).
 - [ ] Örnek Rust sorusunda Faz 1'e göre daha bütünlüklü bir cevap çıkıyor: komşu chunk'lar, seri bütünlüğü sağlanıyor.
@@ -235,7 +250,7 @@ blog-rag/
 
 **Faz 2**
 7. ✅ Neo4j compose'a eklenecek + `build_graph.py` (deterministik graph + vector index)
-8. Graph retrieval + `ask.py`
+8. ✅ Graph retrieval + `ask.py`
 9. Pilot entity extraction (Rust alt kümesi)
 10. Faz 1 ve Faz 2 karşılaştırmalı eval + bulguların yazılması
 
