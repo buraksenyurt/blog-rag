@@ -3,9 +3,10 @@ from pathlib import Path
 import pytest
 from qdrant_client import QdrantClient
 
+from common.chunk_store import embedding_title
 from common.config import EmbeddingProfile
 from common.embedding_cache import EmbeddingCache
-from phase1_vector.ingest import embedding_title, ingest
+from phase1_vector.ingest import ingest
 from phase1_vector.store import collection_name, point_id
 
 PROFILE = EmbeddingProfile(

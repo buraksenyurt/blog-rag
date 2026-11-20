@@ -45,6 +45,11 @@ class Settings(BaseSettings):
 
     qdrant_url: str = "http://localhost:6333"
 
+    neo4j_url: str = "bolt://localhost:7687"
+    neo4j_user: str = "neo4j"
+    neo4j_password: str = "blograg-neo4j"
+    neo4j_database: str = "neo4j"
+
     data_dir: Path = Path("data")
 
     @field_validator("posts_dir", "data_dir", "embedding_profiles_file")

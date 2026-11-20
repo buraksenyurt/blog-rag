@@ -9,15 +9,13 @@ Kullanım:
 from __future__ import annotations
 
 import argparse
-import json
 import sys
 import time
-from collections.abc import Iterator
 from dataclasses import dataclass
-from pathlib import Path
 
 from qdrant_client import QdrantClient, models
 
+from common.chunk_store import batched, embedding_input, read_chunks
 from common.config import EmbeddingProfile, ensure_writable, get_settings, load_embedding_profile
 from common.embedding_cache import EmbeddingCache
 from common.embeddings import Embedder
@@ -36,32 +34,6 @@ class IngestReport:
     cached: int
     deleted_stale: int
     seconds: float
-
-
-def read_chunks(path: Path, limit: int | None = None) -> list[dict]:
-    if not path.exists():
-        raise FileNotFoundError(f"{path} yok. Önce: uv run python -m scripts.build_chunks")
-    chunks: list[dict] = []
-    with path.open(encoding="utf-8") as f:
-        for line in f:
-            chunks.append(json.loads(line))
-            if limit and len(chunks) >= limit:
-                break
-    return chunks
-
-
-def embedding_title(chunk: dict) -> str:
-    section = chunk.get("section_path")
-    return f"{chunk['title']} > {section}" if section else chunk["title"]
-
-
-def embedding_input(chunk: dict, embedder: Embedder) -> str:
-    return embedder.format_document(chunk["text"], embedding_title(chunk))
-
-
-def batched(items: list, size: int) -> Iterator[list]:
-    for start in range(0, len(items), size):
-        yield items[start : start + size]
 
 
 TRUNCATION_PROBE = " Bu cümle yalnızca kırpılma testi için eklenmiştir." * 400

@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 / Adım 1 (iskelet), Adım 2 (loader + chunker), Adım 3 (embedding cache + Qdrant ingest), Adım 4 (retrieval), Adım 5 (ask.py) ve Adım 6 (eval seti + ölçüm aracı) tamamlandı. İlk retrieval ölçümü yapıldı, eval seti zor sorularla genişletildi. Sıradaki iş: genişletilmiş setle ölçüm ve LLM kıyası, ardından Faz 2. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 tamamlandı (Adım 1–6, eval seti 48 soru). Faz 1 için küçük LLM kıyası (gemma-3-4b-it-qat, qwen3-4b-2507) bekliyor. Faz 2 / Adım 7 (Neo4j + deterministik graph) tamamlandı. Sıradaki iş *Adım 8: graph retrieval + ask*. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -47,6 +47,7 @@ uv run python -m scripts.smoke_test          # LM Studio / Qdrant / kaynak klas�
 uv run python -m scripts.build_chunks        # data/chunks.jsonl + chunk_stats.json (--show SLUG ile tek yazı)
 docker compose up -d qdrant                  # Faz 1 veritabanı
 docker compose up -d neo4j                   # Faz 2 veritabanı
+uv run python -m phase2_graph.build_graph    # Neo4j graph'ı kur (vektörler cache'ten, --recreate)
 uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate, --check-only)
 uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter, --no-code-boost, --no-expand)
 uv run python -m phase1_vector.ask "soru"    # sor (--debug, --show-context, --no-rag, --model X, --n, --budget)

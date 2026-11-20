@@ -11,5 +11,25 @@ services:
       - qdrant_storage:/qdrant/storage
     restart: unless-stopped
 
+  neo4j:
+    image: neo4j:5.26-community   # LTS sürümü, native vector index destekli
+    container_name: blog-rag-neo4j
+    ports:
+      - "7474:7474"   # Neo4j Browser (http://localhost:7474)
+      - "7687:7687"   # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-blograg-neo4j}
+      NEO4J_PLUGINS: '["apoc"]'
+      # 32 GB RAM'li dizüstü için ölçülü bellek ayarları
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1G
+      NEO4J_server_memory_pagecache_size: 1G
+    volumes:
+      - neo4j_data:/data
+      - neo4j_plugins:/plugins
+    restart: unless-stopped
+
 volumes:
   qdrant_storage:
+  neo4j_data:
+  neo4j_plugins:

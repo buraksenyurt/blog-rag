@@ -5,6 +5,7 @@ description = "buraksenyurt.github.io yazıları üzerinde vektör ve graph taba
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "neo4j>=5.20",
     "openai>=1.50",
     "pydantic>=2.8",
     "pydantic-settings>=2.4",

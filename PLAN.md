@@ -13,7 +13,7 @@ Faz 1 klasik vektör RAG olacak (Qdrant), Faz 2 graph tabanlı RAG olacak (Neo4j
 |---|---|
 | Dil | Python 3.12, paket yönetimi `uv` |
 | Embedding | LM Studio → profil tabanlı. Varsayılan profil `embeddinggemma` (768 boyut). Alternatif olarak `bge-m3` (prefix'siz) seçilebilir |
-| LLM | LM Studio → `meta-llama-3-8b-instruct` ile başlanacak. Model config'ten değişebilir olacak, Qwen3-8B / Gemma-3-12B ile kıyaslanacak |
+| LLM | LM Studio → `meta-llama-3-8b-instruct` ile başlanacak. Model config'ten değişebilir olacak. Donanım sınırı nedeniyle küçük modellerle kıyaslanacak: `gemma-3-4b-it-qat` (Q4_0) ve `qwen3-4b-2507` (Instruct, Q4_K_M) |
 | API | LM Studio'nun OpenAI uyumlu endpoint'i (`http://localhost:1234/v1`), `openai` Python paketi |
 | Vektör DB | Qdrant (docker-compose) |
 | Graph DB | Neo4j 5.x Community + APOC (docker-compose). Native vector index de kullanılacak |
@@ -139,7 +139,7 @@ blog-rag/
 - Sistem prompt'u: "Yalnızca verilen bağlama dayan, Türkçe cevap ver, kod örneklerini bağlamdan uyarla, sonunda kaynak yazıları listele. Bağlam yetersizse bunu açıkça söyle."
 - Her context chunk'ı `[#n] {title} ({date}) — {section_path}` başlığıyla verilecek. Cevaptaki atıflar `[#n]` formatında olacak.
 - CLI kullanımı: `uv run python -m phase1_vector.ask "Rust dilinde değişken kullanımları ile ilgili örnekler yaz"` → çıktıda cevap, kullanılan kaynaklar (başlık + blog URL'i) ve `--debug` ile retrieval skorları görünecek.
-- Model `--model` parametresi ile değiştirilebilecek (Llama 3 8B, Qwen3-8B, Gemma-3-12B kıyası için).
+- Model `--model` parametresi ile değiştirilebilecek (Llama 3 8B, Gemma 3 4B QAT, Qwen3 4B Instruct 2507 kıyası için).
 
 - Uygulama (Adım 5): Prompt'lar `common/prompts.py` içinde. Cevap konsola canlı akıyor, kaynak listesinde atıf yapılan parçalar ✓ ile işaretleniyor. Atıf yoksa ya da geçersiz numara varsa uyarı veriliyor. Her soru `data/runs/ask-{tarih}.jsonl` dosyasına kaydediliyor (eval için). `--no-rag` bağlamsız cevap veriyor, kıyas için kullanılıyor.
 
@@ -178,6 +178,12 @@ blog-rag/
 - Neo4j vector index tanımı: `CREATE VECTOR INDEX chunk_emb FOR (c:Chunk) ON c.embedding` (768 boyut, cosine).
 - Tag normalizasyonu yapılacak (`csharp`/`c#`, `.net`/`dotnet` gibi). Gerekirse `(:Tag)-[:ALIAS_OF]->(:Tag)` ilişkisi kurulacak.
 - Bu adım tek başına güçlü bir graph çıkarıyor çünkü front matter zaten kaliteli.
+- Uygulama (Adım 7): Graph `neo4j:5.26-community` (LTS) ile kuruluyor. Vektörler Faz 1'in embedding cache'inden okunuyor: 10.515 chunk'ın hepsi cache'te, yeniden embed gerekmiyor, LM Studio'ya da ihtiyaç yok.
+  - Tag adları küçük harfe normalize ediliyor. Farklı yazılışları `Tag.variants` alanında tutuluyor (`PostgreSQL`/`postgresql` gibi).
+  - Plana ek olarak `(:Series)` düğümü var. Aynı başlık önekini paylaşan en az 3 yazı tarih sırasıyla bir seri sayılıyor ve sıra `IN_SERIES.position` ilişkisinde tutuluyor. 226 yazı bir seriye bağlandı. Örnekler: Ruby Kod Parçacıkları (35), GoLang (20), Rust Pratikleri (15). Bazı "seriler" aslında konu öneki (`WCF`, `GoLang`). Ad bu yüzden bilerek geniş tutuldu.
+  - Blog içi linklerden 114 `LINKS_TO` ilişkisi kuruldu. Kapsam dışı yazılara giden 3 link atlandı.
+  - Kurulum idempotent çalışıyor: her şey MERGE ile yazılıyor, yeniden kurulumda eski ilişkiler temizleniyor, chunks.jsonl'da olmayan düğümler siliniyor. Graph'ın hangi embedding profiliyle kurulduğu `(:GraphMeta)` düğümünde tutuluyor. Farklı bir profille kurmak `--recreate` gerektiriyor.
+  - Kurulum sonunda doğrulama sorguları çalışıyor: Rust yazı sayısı, Go yazılarının yıllara göre dağılımı, Rust Pratikleri serisi ve vector index'in kendi vektörüyle sınanması.
 
 ### 2.4 LLM ile Kavram Çıkarımı (`extract_entities.py`) — kapsamı sınırlı tutulacak
 - 8B bir modelle ~10,5 bin chunk işlemek yavaş olur, sonuçlar da gürültülü çıkar. Bu yüzden önce bir pilot yapılacak: yalnızca `rust` + 2–3 tag alt kümesi (~100–150 yazı).
@@ -228,7 +234,7 @@ blog-rag/
 6. ✅ Eval seti + ölçüm aracı, ilk retrieval ölçümü yapıldı. Opsiyonel olarak reranker, LLM kıyası ve embedding profili kıyası (embeddinggemma / bge-m3).
 
 **Faz 2**
-7. Neo4j compose'a eklenecek + `build_graph.py` (deterministik graph + vector index)
+7. ✅ Neo4j compose'a eklenecek + `build_graph.py` (deterministik graph + vector index)
 8. Graph retrieval + `ask.py`
 9. Pilot entity extraction (Rust alt kümesi)
 10. Faz 1 ve Faz 2 karşılaştırmalı eval + bulguların yazılması
@@ -236,6 +242,7 @@ blog-rag/
 ---
 
 ## 6. Açık Konular / Riskler
+- **`pytz` bağımlılığı:** `neo4j` Python sürücüsü (6.4.1) `pytz`'yi zorunlu bağımlılık olarak getiriyor. `pytz` PyPI'de deprecated olarak işaretli (2038 sonrası tarihlerde hata veriyor, yerine standart kütüphanedeki `zoneinfo` öneriliyor). Kodumuz `pytz`'yi kullanmıyor ve `import neo4j` onu belleğe yüklemiyor. Sürücü onu sadece saat dilimli tarih-saat değerlerini Python'a çevirirken kullanıyor, bizim sorgularımız ise tarihleri metin ya da sayı olarak döndürüyor. Karar: resmi sürücüyle devam ediliyor, `pytz` dışlanmıyor. Sürücü güncellemelerinde tekrar bakılacak (sürücü `zoneinfo`'ya geçerse bağımlılık kendiliğinden düşer).
 - **Donanım:** Geliştirme makinesinde ayrı bir GPU yok. Intel Iris Xe tümleşik grafik, i7-1255U (15 W, 10 çekirdek) ve 32 GB RAM var. Llama 3 8B ile ~3.000 tokenlik bağlamlı bir cevap ~6 dakika sürüyor, embedding hızı ~2,6 chunk/sn. Model seçiminde ve bağlam boyutunda bu sınır gözetilmeli: 8B'den büyük modeller pratik değil.
 - **Llama 3 8B Türkçe kalitesi:** model kıyası 1.6'da yapılacak. Context penceresi 8K olduğu için context bütçesi sıkı tutulmalı.
 - **Eski yazılar (2003–2012):** ağırlıklı olarak .NET/WCF içeriği var. Zaman filtresi veya tarih ağırlığı gerekebilir, eval sonuçlarına göre karar verilecek.
