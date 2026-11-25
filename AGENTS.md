@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Plan tamamlandı: Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10). Bulgular `docs/FINDINGS.md` dosyasında, tablolar `eval.report` ile üretiliyor. LLM seçimi park edildi: Qwen3 4B Instruct ölçümü eksik. Açık öneriler: hibrit arama, koşullu seri genişletmesi, kavram çıkarımı v4. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10) tamamlandı, bulgular `docs/FINDINGS.md` dosyasında. Faz 3 (ders demo arabirimi, Streamlit) planlandı: PLAN.md bölüm 3b ve Adım 11–15. Sıradaki iş *Adım 11: hazırlık düzenlemeleri + `ui/service.py`*. LLM seçimi park edildi. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 

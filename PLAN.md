@@ -257,6 +257,78 @@ blog-rag/
 
 ---
 
+## 3b. Faz 3 — Ders Demo Arabirimi (Streamlit)
+
+Amaç: Derste projeksiyonda soru girip aynı soruya **vektör RAG** (Faz 1) ve **graph RAG**
+(Faz 2) ile cevap almak, ikisini yan yana karşılaştırmak ve RAG'in iç işleyişini
+(getirilen chunk'lar, skorlar, graph bilgisi, LLM'e giden prompt) öğrencilere göstermek.
+
+### 3b.1 Kararlar (2026-11-26)
+
+| Konu | Karar | Gerekçe |
+|---|---|---|
+| Kullanım | Eğitmen makinesinde, projeksiyonda demo. Tek kullanıcı. | Bu makinede bir cevap ~70 sn (Gemma 3 4B) ve LM Studio aynı anda tek cevap üretiyor. Çok kullanıcılı erişim kuyruk ve uzun bekleme demek. |
+| Teknoloji | Streamlit (Python) | Mevcut `common/` kodunu doğrudan kullanıyor. Stream, tablo ve genişletilebilir paneller hazır. Ayrı bir API katmanı gerekmiyor. |
+| Mod | Seçmeli: Vektör / Graph. İsteğe bağlı "Karşılaştır": iki cevap sırayla üretilir, yan yana gösterilir. | Karşılaştırma iki kat sürüyor (~2,5 dk), bu yüzden varsayılan değil. |
+| Görünürlük | Kaynak yazılar (linkli), getirilen chunk'lar ve skorlar, graph bilgisi, LLM'e giden tam prompt, süreler | RAG'in iç işleyişini derste göstermek. Prompt anatomisi görselindeki parçalar arayüzde görünür olmalı. |
+
+Kapsam dışı (şimdilik): çok kullanıcılı erişim, kimlik doğrulama, internete açma.
+Mimari bunları sonradan eklemeye izin verecek şekilde kurulacak: arayüz mantığı
+`ui/service.py` içinde, Streamlit'ten bağımsız tutulacak.
+
+### 3b.2 Yapı
+
+```
+ui/
+├── app.py          # Streamlit sayfası (ince katman: düzen, widget'lar, gösterim)
+├── service.py      # Streamlit'ten bağımsız: kaynak bağlantıları, servis durumu, soru çalıştırma
+└── components.py   # tekrar kullanılan gösterimler: cevap kartı, kaynaklar, chunk tablosu, prompt
+.streamlit/config.toml   # headless, telemetri kapalı, geniş düzen
+```
+
+### 3b.3 Ekran düzeni
+
+- **Kenar çubuğu:**
+  - Servis durumu: LM Studio, Qdrant ve Neo4j ayakta mı, embedding modeli ve LLM yüklü mü. Kapalı olan servisin modu devre dışı kalır ve sebebi yazılır.
+  - LLM modeli: LM Studio'daki yüklü modellerden seçilir. LLM seçimi park edildiği için derste modeller karşılaştırılabilir.
+  - Retrieval ayarları: chunk sayısı (`n`), token bütçesi, sıcaklık. Graph için genişletme, yapısal sorgular ve kavram katmanı (varsayılan kapalı).
+  - Örnek sorular: eval setinden normal, zor ve yapısal birer örnek, tek tıkla soru kutusuna gelir.
+- **Ana alan:**
+  - Soru kutusu, mod seçimi (Vektör / Graph / Karşılaştır), "Sor" düğmesi.
+  - Cevap: canlı akış (stream). Bitince `[#n]` atıflarının karşılığı olan kaynak yazılar linkleriyle listelenir (atıf yapılanlar işaretli).
+  - Genişletilebilir paneller:
+    1. Getirilen chunk'lar: sıra, final skor, ham skor, F/k/G boost işaretleri, graph'tan gelme nedeni, bölüm, LLM'e gidip gitmediği.
+    2. Graph bilgisi: yapısal sorgu sonucu (varsa).
+    3. LLM'e giden prompt: sistem prompt'u ve kullanıcı mesajı (bağlam + soru), aynen.
+    4. Süreler: retrieval, ilk token, toplam üretim, bağlam token'ı.
+- **Karşılaştır modu:**
+  - İki sütun: önce vektör, sonra graph cevabı üretilir. Her sütun kendi panellerini gösterir.
+  - Üstte retrieval farkı özetlenir: iki bağlamda ortak olan yazılar, yalnızca birinde olanlar, graph bilgisi var mı.
+- **Soru geçmişi:** Oturum içindeki sorular ve cevaplar listelenir. Her soru `data/runs/` altına `phase: "ui-vector"` / `"ui-graph"` olarak kaydedilir.
+
+### 3b.4 Demo kolaylıkları
+
+- **Cevap cache'i (isteğe bağlı, varsayılan açık):** Aynı soru + mod + model + ayarlar için daha önce üretilmiş cevap `data/ui_cache/` altından anında gösterilir, "yeniden üret" düğmesiyle tazelenir. Ders öncesi örnek soruların cevapları hazırlanıp derste beklemeden gösterilebilir.
+- **Ön ısıtma:** Uygulama açılışta embedding modelini ve veritabanı bağlantılarını hazırlar (`st.cache_resource`), ilk sorudaki gecikme azalır.
+- Projeksiyon için geniş düzen ve okunaklı kod blokları.
+
+### 3b.5 Gerekli küçük düzenlemeler
+
+- `common/answering.answer_question` önceden yapılmış bir retrieval sonucunu kabul edecek. Arayüz retrieval'ı bir kez yapıp hem tabloyu gösterecek hem cevabı üretecek. Şu an `--debug` retrieval'ı iki kez çalıştırıyor.
+- `AskResult` LLM'e giden mesajları (`messages`) da taşıyacak. Prompt paneli bunu gösterecek.
+- Retrieval tablosu için `print_result` mantığı yapısal veriye (satır listesi) ayrılacak. Konsol ve arayüz aynı veriyi kullanacak.
+
+### 3b.6 Faz 3 Bitti Kriterleri
+
+- [ ] `uv run streamlit run ui/app.py` ile arayüz açılıyor. Servis durumu doğru görünüyor, kapalı servisin modu devre dışı kalıyor.
+- [ ] Vektör ve graph modlarında cevap canlı akıyor. Kaynaklar, chunk tablosu, graph bilgisi, prompt ve süreler görünüyor.
+- [ ] Karşılaştır modunda iki cevap yan yana, retrieval farkı özetli.
+- [ ] Örnek sorular ve cevap cache'i çalışıyor. Cache'teki bir cevap anında geliyor.
+- [ ] `ui/service.py` testli. Arayüz için Streamlit `AppTest` ile sahte servislerle bir duman testi var.
+- [ ] README'de arayüz bölümü var.
+
+---
+
 ## 4. Değerlendirme (her iki faz için ortak)
 - `eval/questions.yaml` dosyasında ~25–30 soru olacak. Her soru için beklenen yazı slug'ları yazılacak. Üç soru tipi bulunacak:
   - **Olgusal/örnek:** "Rust'ta değişken tanımlama örnekleri", "WCF'te binding türleri"
@@ -291,6 +363,13 @@ blog-rag/
 8. ✅ Graph retrieval + `ask.py`
 9. ✅ Pilot entity extraction (Rust alt kümesi)
 10. ✅ Faz 1 ve Faz 2 karşılaştırmalı eval + bulguların yazılması → [docs/FINDINGS.md](./docs/FINDINGS.md), tablolar `eval.report` ile
+
+**Faz 3 (demo arabirimi)**
+11. Hazırlık: `answer_question` dışarıdan retrieval sonucu alabilecek, `AskResult.messages`, retrieval tablosu için yapısal veri, `ui/service.py` (bağlantılar, servis durumu, soru çalıştırma) + testler
+12. Streamlit arayüzü: kenar çubuğu (durum, model, ayarlar, örnek sorular), soru kutusu, tek mod cevap akışı, kaynaklar ve paneller (chunk'lar, graph bilgisi, prompt, süreler)
+13. Karşılaştır modu: iki sütun, sıralı üretim, retrieval farkı özeti
+14. Demo kolaylıkları: cevap cache'i ve yeniden üret, soru geçmişi, çalıştırma kaydı, ön ısıtma
+15. Doğrulama ve doküman: `AppTest` duman testi, README arayüz bölümü, ders akışı için kısa kullanım notu
 
 ---
 
