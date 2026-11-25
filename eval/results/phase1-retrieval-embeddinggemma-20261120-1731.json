@@ -1,0 +1,203 @@
+{
+  "phase": 1,
+  "embedding_profile": "embeddinggemma",
+  "created": "20261120-1731",
+  "retrieval_config": {
+    "k": 20,
+    "n": 4,
+    "use_filter": true,
+    "boost": 0.05,
+    "max_per_post": 3,
+    "mmr_lambda": 0.7,
+    "token_budget": 2000,
+    "code_boost": 0.02,
+    "expand_short": true,
+    "short_tokens": 150
+  },
+  "variants": {
+    "full": {}
+  },
+  "summary": {
+    "full": {
+      "hit_ctx": 1.0,
+      "recall_ctx": 0.85,
+      "mrr": 0.729,
+      "recall_k": 1.0,
+      "hit_ctx[example]": 1.0,
+      "hit_ctx[relational]": 0.0,
+      "normal": {
+        "hit_ctx": 1.0,
+        "recall_ctx": 0.812,
+        "mrr": 0.661,
+        "recall_k": 1.0
+      },
+      "hard": {
+        "hit_ctx": 1.0,
+        "recall_ctx": 1.0,
+        "mrr": 1.0,
+        "recall_k": 1.0
+      },
+      "structural_ok": null
+    }
+  },
+  "questions": [
+    {
+      "id": "rust-variables",
+      "type": "example",
+      "difficulty": "normal",
+      "relevant": [
+        "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+        "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+        "2021-12-24-programcidan-programciya-rust",
+        "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.75,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak",
+            "2026-01-15-bunu-bir-dene-00-metot-argumanlarinda-degisiklik-c-rust-ve-zig",
+            "2022-04-24-rust-pratikleri-oop"
+          ],
+          "context_tokens": 977,
+          "facts": [],
+          "structural_ok": null
+        }
+      }
+    },
+    {
+      "id": "rust-shadowing",
+      "type": "example",
+      "difficulty": "normal",
+      "relevant": [
+        "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 0.14285714285714285,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2026-05-09-rust-phantom-data",
+            "2022-04-24-rust-pratikleri-oop",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-04-24-rust-pratikleri-oop",
+            "2022-05-22-rust-pratikleri-value-moved-here",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2026-05-09-rust-phantom-data"
+          ],
+          "context_tokens": 1090,
+          "facts": [],
+          "structural_ok": null
+        }
+      }
+    },
+    {
+      "id": "rust-lifetimes",
+      "type": "example",
+      "difficulty": "normal",
+      "relevant": [
+        "2022-03-06-rust-pratikleri-lifetimes-mevzusu",
+        "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 0.5,
+          "mrr": 0.5,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-03-06-rust-pratikleri-lifetimes-mevzusu"
+          ],
+          "top_candidates": [
+            "2021-12-24-programcidan-programciya-rust",
+            "2022-03-06-rust-pratikleri-lifetimes-mevzusu",
+            "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir",
+            "2025-10-25-rust-ile-kodlama-idmanlari-baslangic-seviyesi",
+            "2025-02-14-rust-ve-guvenli-bellek-yonetimi-hakkinda"
+          ],
+          "context_tokens": 1214,
+          "facts": [],
+          "structural_ok": null
+        }
+      }
+    },
+    {
+      "id": "go-defer-panic",
+      "type": "example",
+      "difficulty": "normal",
+      "relevant": [
+        "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim",
+            "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek"
+          ],
+          "top_candidates": [
+            "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim",
+            "2017-05-15-golang-concurrency-goroutine-channel",
+            "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek",
+            "2017-06-18-golang-ticker-ile-periyodik-is-calistirma",
+            "2017-01-13-gopher-olma-calismalari"
+          ],
+          "context_tokens": 1149,
+          "facts": [],
+          "structural_ok": null
+        }
+      }
+    },
+    {
+      "id": "hard-test-email-sending",
+      "type": "example",
+      "difficulty": "hard",
+      "relevant": [
+        "2026-09-07-light-mail-server"
+      ],
+      "variants": {
+        "full": {
+          "hit_ctx": 1.0,
+          "recall_ctx": 1.0,
+          "mrr": 1.0,
+          "recall_k": 1.0,
+          "context_posts": [
+            "2026-09-07-light-mail-server",
+            "2018-04-07-express-api-hizmetini-heroku-uzerine-tasimak",
+            "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi"
+          ],
+          "top_candidates": [
+            "2026-09-07-light-mail-server",
+            "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi",
+            "2019-08-23-microsoft-custom-vision-servisini-python-ile-kullanmak",
+            "2018-04-07-express-api-hizmetini-heroku-uzerine-tasimak",
+            "2017-12-08-jwt-json-web-token-kullanimi"
+          ],
+          "context_tokens": 1518,
+          "facts": [],
+          "structural_ok": null
+        }
+      }
+    }
+  ]
+}

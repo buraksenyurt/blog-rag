@@ -85,6 +85,16 @@ def answer_question(
     )
 
 
+def empty_answer_reason(llm: LLM) -> str:
+    """Model hiç cevap metni üretmediğinde kullanıcıya gösterilecek açıklama."""
+    reasoning = getattr(llm, "last_reasoning_chars", 0) or 0
+    detail = f" ({reasoning} karakter düşünme metni üretti)" if reasoning else ""
+    return (
+        f"Boş cevap{detail}: model çıktısını düşünme (reasoning) bölümüne yazmış ya da "
+        "max_tokens dolmuş olabilir. Thinking modeli yerine Instruct sürümünü kullanın."
+    )
+
+
 def print_sources(result: AskResult) -> None:
     if not result.use_rag:
         return

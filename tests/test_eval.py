@@ -160,3 +160,22 @@ def test_answers_markdown_marks_errors(tmp_path) -> None:
     write_answers_markdown([row], path, "m", "p")
     text = path.read_text(encoding="utf-8")
     assert "## q1 (example, zor)" in text and "**HATA:** APITimeoutError" in text
+
+
+class _ThinkingLLM:
+    """Bütün çıktısını düşünme bölümüne yazan, cevap metni üretmeyen model taklidi."""
+
+    model = "thinking-llm"
+    last_reasoning_chars = 4096
+
+    def stream(self, messages, temperature=0.2, max_tokens=1024):
+        return iter(())
+
+
+def test_run_llm_flags_empty_answers_from_thinking_models() -> None:
+    from eval.run_eval import run_llm, summarize_answers
+
+    questions = [{"id": "q1", "type": "example", "question": "a", "relevant": ["x"]}]
+    rows = run_llm(questions, _Retriever(), _ThinkingLLM())
+    assert rows[0]["error"].startswith("Boş cevap (4096 karakter düşünme metni üretti)")
+    assert summarize_answers(rows)["answered"] == 0

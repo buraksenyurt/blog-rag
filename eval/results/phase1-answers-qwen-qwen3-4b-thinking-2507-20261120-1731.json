@@ -1,0 +1,271 @@
+{
+  "model": "qwen/qwen3-4b-thinking-2507",
+  "embedding_profile": "embeddinggemma",
+  "retrieval_config": {
+    "k": 20,
+    "n": 4,
+    "use_filter": true,
+    "boost": 0.05,
+    "max_per_post": 3,
+    "mmr_lambda": 0.7,
+    "token_budget": 2000,
+    "code_boost": 0.02,
+    "expand_short": true,
+    "short_tokens": 150
+  },
+  "summary": {
+    "answered": 5,
+    "errors": 0,
+    "citation_rate": 0.0,
+    "turkish_ratio": null,
+    "generation_seconds": 271.7,
+    "first_token_seconds": null
+  },
+  "answers": [
+    {
+      "id": "rust-variables",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust dilinde değişken kullanımları ile ilgili örnekler yaz.",
+      "expected": null,
+      "answer": "",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0034",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak#0006",
+          "title": "Rust Pratikleri - Değişkenleri Kopyalayarak veya Referans Olarak Taşımak",
+          "url": "https://buraksenyurt.github.io/2022/04/17/rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2021-12-24-programcidan-programciya-rust#0025",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": null,
+      "generation_seconds": 380.06,
+      "first_token_seconds": null,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "rust-shadowing",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta shadowing nedir, örnekle açıklar mısın?",
+      "expected": null,
+      "answer": "",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0037",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2026-05-09-rust-phantom-data#0006",
+          "title": "Rust Dilinde Phantom Type Kullanımı: PhantomData",
+          "url": "https://buraksenyurt.github.io/2026/05/09/rust-phantom-data/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2022-04-24-rust-pratikleri-oop#0002",
+          "title": "Rust Pratikleri - OOP",
+          "url": "https://buraksenyurt.github.io/2022/04/24/rust-pratikleri-oop/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": null,
+      "generation_seconds": 245.58,
+      "first_token_seconds": null,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "rust-lifetimes",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta lifetime kavramı neden gereklidir?",
+      "expected": null,
+      "answer": "",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0040",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0000",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0009",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0007",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": null,
+      "generation_seconds": 313.85,
+      "first_token_seconds": null,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "go-defer-panic",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Go'da defer, panic ve recover nasıl çalışır?",
+      "expected": null,
+      "answer": "",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0004",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0005",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0008",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek#0000",
+          "title": "GO Ortamında Minik Bir CRUD Servisini Gin-Gonic ile Geliştirmek",
+          "url": "https://buraksenyurt.github.io/2020/09/03/go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek/",
+          "relevant": false,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": null,
+      "generation_seconds": 251.89,
+      "first_token_seconds": null,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "hard-test-email-sending",
+      "type": "example",
+      "difficulty": "hard",
+      "question": "E-posta gönderen bir kodu gerçek bir posta sunucusu olmadan nasıl test edebilirim?",
+      "expected": null,
+      "answer": "",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2026-09-07-light-mail-server#0001",
+          "title": "Testler için Bir Mail Sunucusu Yazmak",
+          "url": "https://buraksenyurt.github.io/2026/09/07/light-mail-server/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2018-04-07-express-api-hizmetini-heroku-uzerine-tasimak#0006",
+          "title": "Express API Hizmetini Heroku Üzerine Taşımak",
+          "url": "https://buraksenyurt.github.io/2018/04/07/express-api-hizmetini-heroku-uzerine-tasimak/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi#0010",
+          "title": "TCP Bazlı Soket Haberleşmesinde Sertifika Kullanımı",
+          "url": "https://buraksenyurt.github.io/2015/11/09/tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2026-09-07-light-mail-server#0013",
+          "title": "Testler için Bir Mail Sunucusu Yazmak",
+          "url": "https://buraksenyurt.github.io/2026/09/07/light-mail-server/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": null,
+      "generation_seconds": 167.03,
+      "first_token_seconds": null,
+      "facts": [],
+      "error": null
+    }
+  ]
+}

@@ -29,7 +29,7 @@ import yaml
 from openai import APIError
 from qdrant_client import QdrantClient
 
-from common.answering import answer_question, retrieval_config
+from common.answering import answer_question, empty_answer_reason, retrieval_config
 from common.config import ROOT, ensure_writable, get_settings, load_embedding_profile
 from common.embeddings import Embedder
 from common.llm import LLM
@@ -49,12 +49,14 @@ VARIANTS: dict[str, dict] = {
     "filter+code": {"use_filter": True, "expand_short": False},
     "full": {},
 }
-# Faz 2: vector index / tam cosine (index'siz, kıyas için) / + graph genişletme / + yapısal
+# Faz 2: vector index (HNSW) / tam cosine (varsayılan giriş, Faz 1 ile eşdeğer) /
+# + graph genişletme / + yapısal sorgular / + kavram genişletmesi (Adım 9 pilotu)
 GRAPH_VARIANTS: dict[str, dict] = {
-    "vector": {"graph_expand": False, "structural": False},
-    "exact": {"exact_search": True, "graph_expand": False, "structural": False},
-    "graph": {"graph_expand": True, "structural": False},
+    "vector": {"exact_search": False, "graph_expand": False, "structural": False},
+    "exact": {"graph_expand": False, "structural": False},
+    "graph": {"structural": False},
     "full": {},
+    "concepts": {"concept_expand": True},
 }
 PHASE_VARIANTS = {1: VARIANTS, 2: GRAPH_VARIANTS}
 NUMBER_RE = re.compile(r"\d+")
@@ -238,6 +240,14 @@ def run_llm(
             row["error"] = f"{type(exc).__name__}: {exc}"
             print(f" HATA ({type(exc).__name__})", flush=True)
         else:
+            if not result.answer.strip():
+                row["error"] = empty_answer_reason(llm)
+                row["generation_seconds"] = result.generation_seconds
+                print(f" BOŞ CEVAP ({result.generation_seconds:.0f}s)", flush=True)
+                rows.append(row)
+                if save is not None:
+                    save(rows)
+                continue
             row.update(
                 answer=result.answer,
                 sources=[

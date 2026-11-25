@@ -15,9 +15,9 @@ import sys
 from openai import APIError, APITimeoutError
 from qdrant_client import QdrantClient
 
-from common.answering import (  # noqa: F401  (AskResult geriye dönük import için)
-    AskResult,
+from common.answering import (
     answer_question,
+    empty_answer_reason,
     log_run,
     print_sources,
     retrieval_config,
@@ -79,6 +79,8 @@ def main() -> int:
 
     if args.no_stream:
         print(result.answer)
+    if not result.answer.strip():
+        print(f"\n! {empty_answer_reason(llm)}")
     print_sources(result)
     first = f" (ilk token {result.first_token_seconds}s)" if result.first_token_seconds else ""
     context_tokens = sum(h.total_tokens for h in result.hits)

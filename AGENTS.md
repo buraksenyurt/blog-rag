@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 tamamlandı (Adım 1–6, eval seti 48 soru). Faz 1 için küçük LLM kıyası (gemma-3-4b-it-qat, qwen3-4b-2507) bekliyor. Faz 2 / Adım 7 (Neo4j + deterministik graph) ve Adım 8 (graph retrieval + yapısal sorular + ask) tamamlandı. Sıradaki iş: Faz 2 ölçümü (`eval.run_eval --phase 2`), ardından Adım 9 (kavram çıkarımı pilotu). Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Plan tamamlandı: Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10). Bulgular `docs/FINDINGS.md` dosyasında, tablolar `eval.report` ile üretiliyor. LLM seçimi park edildi: Qwen3 4B Instruct ölçümü eksik. Açık öneriler: hibrit arama, koşullu seri genişletmesi, kavram çıkarımı v4. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -50,7 +50,9 @@ docker compose up -d neo4j                   # Faz 2 veritabanı
 uv run python -m phase2_graph.build_graph    # Neo4j graph'ı kur (vektörler cache'ten, --recreate)
 uv run python -m phase2_graph.retrieve "soru" # graph retrieval, LLM yok (--no-graph, --no-structural)
 uv run python -m phase2_graph.ask "soru"      # Faz 2 cevap (--debug, --model X, --n, --budget)
-uv run python -m eval.run_eval --phase 2     # Faz 2 varyant kıyası (vector / graph / full)
+uv run python -m eval.run_eval --phase 2     # Faz 2 varyant kıyası (vector / exact / graph / full / concepts)
+uv run python -m eval.report --out docs/results_tables.md  # karşılaştırma tabloları
+uv run python -m phase2_graph.extract_entities --limit 3 --dry-run  # kavram çıkarımı pilotu (Rust, cache'li)
 uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate, --check-only)
 uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter, --no-code-boost, --no-expand)
 uv run python -m phase1_vector.ask "soru"    # sor (--debug, --show-context, --no-rag, --model X, --n, --budget)

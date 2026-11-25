@@ -132,7 +132,8 @@ def row(
 def make_retriever(responses: dict) -> tuple[GraphRetriever, FakeRunner]:
     responses = {"MATCH (s:Series) RETURN": [[{"name": n} for n in SERIES]], **responses}
     run = FakeRunner(responses)
-    return GraphRetriever(FakeEmbedder(), run, GraphRetrievalConfig(n=3)), run
+    # Testler index yolunu kullanır; tam cosine yolu ayrıca test ediliyor.
+    return GraphRetriever(FakeEmbedder(), run, GraphRetrievalConfig(n=3, exact_search=False)), run
 
 
 def test_graph_retriever_merges_filtered_and_related_candidates() -> None:
@@ -241,3 +242,44 @@ def test_exact_search_uses_full_scan_instead_of_index() -> None:
     result = retriever.retrieve("soru", exact_search=True, use_filter=False, graph_expand=False)
     assert [h.id for h in result.candidates] == ["a#0000"]
     assert run.queries("db.index.vector.queryNodes") == []
+
+
+def test_exact_search_is_the_default_entry() -> None:
+    assert GraphRetrievalConfig().exact_search is True
+    assert GRAPH_VARIANTS["vector"]["exact_search"] is False
+
+
+def test_concept_expansion_adds_mentioning_chunks() -> None:
+    retriever, run = make_retriever(
+        {
+            "db.index.vector.queryNodes": [[row("a#0000", 0.9, [1, 0, 0])]],
+            "RETURN k.name AS name, k.aliases": [
+                [
+                    {"name": "shadowing", "aliases": ["gölgeleme"], "df": 1},
+                    {"name": "rust", "aliases": [], "df": 40},  # merkez kavram, kullanılmaz
+                ]
+            ],
+            "WHERE k.name IN $names": [
+                [row("kimdir#0009", 0.85, [1, 0.2, 0], reasons=["kavram: shadowing"])]
+            ],
+        }
+    )
+    result = retriever.retrieve(
+        "Rust'ta gölgeleme nedir?", concept_expand=True, use_filter=False, graph_expand=False
+    )
+    assert run.queries("WHERE k.name IN $names")[0]["names"] == ["shadowing"]
+    hit = next(h for h in result.candidates if h.id == "kimdir#0009")
+    assert hit.graph_bonus == 0.03 and hit.reasons == ["kavram: shadowing"]
+    assert retriever.query_concepts("rust nedir", max_df=8) == []
+
+
+def test_concept_candidates_are_limited_to_query_technology() -> None:
+    retriever, run = make_retriever(
+        {
+            "db.index.vector.queryNodes": [[row("go#0000", 0.9, [1, 0, 0], tags=["golang"])]],
+            "RETURN k.name AS name, k.aliases": [[{"name": "channel", "aliases": [], "df": 3}]],
+        }
+    )
+    retriever.retrieve("Go'da channel örneği", concept_expand=True, graph_expand=False)
+    params = run.queries("WHERE k.name IN $names")[0]
+    assert params["names"] == ["channel"] and params["tags"] == ["golang"]

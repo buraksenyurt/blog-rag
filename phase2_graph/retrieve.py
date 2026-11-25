@@ -16,12 +16,13 @@ Kullanım:
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, replace
 
 from common.config import get_settings, load_embedding_profile
 from common.embeddings import Embedder
-from common.query_filters import QueryFilter, detect_code_intent, detect_filter
+from common.query_filters import QueryFilter, detect_code_intent, detect_filter, normalize_query
 from common.retrieval import (
     Hit,
     RetrievalConfig,
@@ -31,6 +32,7 @@ from common.retrieval import (
     print_result,
     select_mmr,
 )
+from phase2_graph.concepts import mention_pattern
 from phase2_graph.store import VECTOR_INDEX, Runner, connect, make_runner
 from phase2_graph.structural import answer_structural, detect_structural
 
@@ -112,6 +114,25 @@ WITH best.chunk AS c, o AS p, best.sim AS score, reasons
     + RETURN_CANDIDATE
 )
 
+# Adım 9: sorguda geçen kavramlardan (MENTIONS) aday chunk'lar
+Q_CONCEPT_VOCAB = "MATCH (k:Concept) RETURN k.name AS name, k.aliases AS aliases, k.df AS df"
+Q_CONCEPT_CANDIDATES = (
+    """
+MATCH (k:Concept) WHERE k.name IN $names
+MATCH (c:Chunk)-[:MENTIONS]->(k)
+MATCH (cp:Post)-[:HAS_CHUNK]->(c)
+// Sorguda teknoloji varsa kavram adayları o teknolojinin yazılarından gelir
+// (Go sorusundaki "channel" Rust yazılarındaki channel chunk'larını çekmesin).
+WHERE size($tags) = 0 OR EXISTS { (cp)-[:TAGGED]->(t:Tag) WHERE t.name IN $tags }
+WITH c, collect(k.name) AS concept_names
+WITH c, concept_names, vector.similarity.cosine(c.embedding, $vec) AS score
+ORDER BY score DESC LIMIT $k
+MATCH (p:Post)-[:HAS_CHUNK]->(c)
+WITH c, p, score, [n IN concept_names | 'kavram: ' + n] AS reasons
+"""
+    + RETURN_CANDIDATE
+)
+
 Q_NEXT = """
 MATCH (:Chunk {id: $id})-[:NEXT]->(n:Chunk)
 MATCH (p:Post)-[:HAS_CHUNK]->(n)
@@ -128,7 +149,13 @@ class GraphRetrievalConfig(RetrievalConfig):
     related_limit: int = 4  # eklenecek en fazla komşu yazı
     graph_boost: float = 0.02  # graph ilişkisiyle gelen adaylara eklenen puan
     structural: bool = True  # sayma/listeleme sorularını Cypher şablonlarıyla cevapla
-    exact_search: bool = False  # vector index yerine bütün chunk'larla tam cosine (ölçüm için)
+    # Giriş araması: 10 bin chunk için tam cosine hem hızlı hem kesin. Neo4j'nin HNSW
+    # index'i quantization kapalıyken bile bazı adayları kaçırıyor (eval: vector / exact).
+    # Böylece Faz 2'nin giriş noktası Faz 1 ile aynı olur; fark yalnızca graph'tan gelir.
+    exact_search: bool = True
+    concept_expand: bool = False  # Adım 9: sorgudaki kavramların geçtiği chunk'ları ekle
+    concept_boost: float = 0.03
+    max_concept_df: int = 8  # çok yazıda geçen "merkez" kavramlar (ör. rust) kullanılmaz
 
 
 def to_cosine(score: float) -> float:
@@ -178,6 +205,22 @@ class GraphRetriever:
         self.run = run
         self.config = config or GraphRetrievalConfig()
         self.series_names = [r["name"] for r in run("MATCH (s:Series) RETURN s.name AS name")]
+        self._concept_vocab: list[tuple[str, int, re.Pattern]] | None = None
+
+    def query_concepts(self, query: str, max_df: int) -> list[str]:
+        """Sorguda adı ya da takma adı geçen (ve merkez olmayan) kavramlar."""
+        if self._concept_vocab is None:
+            self._concept_vocab = [
+                (r["name"], r["df"] or 0, pattern)
+                for r in self.run(Q_CONCEPT_VOCAB)
+                if (pattern := mention_pattern([r["name"], *(r["aliases"] or [])]))
+            ]
+        text = normalize_query(query)
+        return [
+            name
+            for name, df, pattern in self._concept_vocab
+            if df <= max_df and pattern.search(text)
+        ]
 
     def _candidates(self, query: str, params: dict) -> list[Hit]:
         return [row_to_hit(r) for r in self.run(query, **params)]
@@ -216,6 +259,19 @@ class GraphRetriever:
             filtered_count = len(filtered)
             for hit in filtered:
                 candidates.setdefault(hit.id, hit)
+
+        if cfg.concept_expand:
+            names = self.query_concepts(query, cfg.max_concept_df)
+            if names:
+                tags = query_filter.tags if query_filter else []
+                concept_hits = self._candidates(
+                    Q_CONCEPT_CANDIDATES,
+                    {"names": names, "vec": vector, "k": cfg.k, "tags": tags},
+                )
+                for hit in concept_hits:
+                    target = candidates.setdefault(hit.id, hit)
+                    target.graph_bonus = max(target.graph_bonus, cfg.concept_boost)
+                    target.reasons = list(dict.fromkeys([*target.reasons, *hit.reasons]))
 
         ranked = apply_boosts(list(candidates.values()), query_filter, code_intent, cfg)
         if cfg.graph_expand and ranked:
@@ -266,8 +322,8 @@ class GraphRetriever:
             candidates.setdefault(hit.id, hit)
         for hit in candidates.values():
             if hit.post_slug in related_posts:
-                hit.graph_bonus = cfg.graph_boost
-                hit.reasons = related_posts[hit.post_slug]
+                hit.graph_bonus = max(hit.graph_bonus, cfg.graph_boost)
+                hit.reasons = list(dict.fromkeys([*hit.reasons, *related_posts[hit.post_slug]]))
 
 
 def main() -> int:
@@ -277,7 +333,8 @@ def main() -> int:
     parser.add_argument("--n", type=int)
     parser.add_argument("--no-graph", action="store_true", help="graph genişletmesini kapat")
     parser.add_argument("--no-structural", action="store_true", help="yapısal sorguları kapat")
-    parser.add_argument("--exact", action="store_true", help="index yerine tam cosine araması")
+    parser.add_argument("--index", action="store_true", help="tam cosine yerine vector index")
+    parser.add_argument("--concepts", action="store_true", help="kavram genişletmesini aç")
     parser.add_argument("--show-text", action="store_true", help="seçilen chunk'ların metnini bas")
     args = parser.parse_args()
 
@@ -286,7 +343,8 @@ def main() -> int:
     overrides = {
         "graph_expand": not args.no_graph,
         "structural": not args.no_structural,
-        "exact_search": args.exact,
+        "exact_search": not args.index,
+        "concept_expand": args.concepts,
     }
     if args.n:
         overrides["n"] = args.n

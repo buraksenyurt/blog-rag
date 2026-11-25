@@ -1,0 +1,273 @@
+{
+  "model": "meta-llama-3-8b-instruct",
+  "embedding_profile": "embeddinggemma",
+  "retrieval_config": {
+    "k": 20,
+    "n": 4,
+    "use_filter": true,
+    "boost": 0.05,
+    "max_per_post": 3,
+    "mmr_lambda": 0.7,
+    "token_budget": 2000,
+    "code_boost": 0.02,
+    "expand_short": true,
+    "short_tokens": 150
+  },
+  "summary": {
+    "answered": 5,
+    "errors": 0,
+    "citation_rate": 0.2,
+    "turkish_ratio": 1.0,
+    "generation_seconds": 148.8,
+    "first_token_seconds": 4.5
+  },
+  "answers": [
+    {
+      "id": "rust-variables",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust dilinde değişken kullanımları ile ilgili örnekler yaz.",
+      "expected": null,
+      "answer": "BAĞLAM'daki bilgilerden hareketle, Rust dilinde değişken kullanımlarına ilişkin örnekler yazalım.\n\nRust dilinde, değişkenlerin immutable olma halini, mutable borrow işlemi ile değiştirilebilir. Aşağıdaki kodda, `intro` değişkeni mutable olarak tanımlandı ve `get_ count` fonksiyonunda değiştirildi.\n```rust\nfn main() {\n    let mut intro: String = String::from(\"Wellcome to the jungle!\");\n    get_count(&mut intro);\n    println!(\"{}\", intro);\n}\n\nfn get_count(text: &mut String) -> usize {\n    let count = text.len();\n    text.push('?'.chars().next().unwrap());\n    println!(\" '{}' cümlesindeki karakter sayısı {}\", text, count);\n    count\n}\n```\nAyrıca, Rust dilinde değişkenlerin yaşam sürelerini kontrol etmemiz gereken durumlar da var. Aşağıdaki kodda, `score` değişkeni immutable olarak tanımlandı ve `print_number` fonksiyonunda kullanıldı.\n```rust\nfn main() {\n    let score = 5_i8;\n    print_number(score);\n    println!(\"{}\", score);\n}\n\nfn print_number(point: i8) {\n    println!(\"{}\", point);\n}\n```\nRust dilinde, değişkenlerin kopyalanması veya referansı ile taşınması da mümkün. Aşağıdaki kodda, `Product` struct'i kopyalandı ve `main` fonksiyonunda kullanıldı.\n```rust\nfn main() {\n    let product = Product { category: &Category { name: \"Tavla\" } };\n    println!(\"Hello {}\", product.category.name);\n}\n\nstruct Product {\n    category: &Category,\n}\n\nstruct Category {\n    name: String,\n}\n```\nYukarıdaki örnekler, Rust dilinde değişken kullanımlarına ilişkin örneklerdir. Değişkenlerin immutable olma halini, mutable borrow işlemi ile değiştirilebilir. Ayrıca, değişkenlerin yaşam sürelerini kontrol etmemiz gereken durumlar da var.",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0034",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak#0006",
+          "title": "Rust Pratikleri - Değişkenleri Kopyalayarak veya Referans Olarak Taşımak",
+          "url": "https://buraksenyurt.github.io/2022/04/17/rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2021-12-24-programcidan-programciya-rust#0025",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 162.67,
+      "first_token_seconds": 6.4,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "rust-shadowing",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta shadowing nedir, örnekle açıklar mısın?",
+      "expected": null,
+      "answer": "Sorulara cevap vermeye çalışacağım.\n\n1. Soru: Rust'ta sahiplik referans usulü ile ödünç alma nedir?\n\nCevap: Rust'ta sahiplik referans usulü ile ödünç alma, bir değişkenin değerini başka bir değişkene aktarmak için kullanılan bir yöntemdir. Bu yöntem, inner isimli değişkenin değerini outer isimli değişkene aktarmak için kullanılır.\n\n2. Soru: Rust'ta PhantomData nedir?\n\nCevap: Rust'ta PhantomData, derleme zamanında veri yapısının türünü belirlemek için kullanılan bir yapıdır. Örneğin, `Component<Render>` veri yapısı, hangi ortam için render edilecek bileşenleri temsil eder. `PhantomData<Render>` kullanarak, bu tür bilgisi derleme zamanında belirtilir.\n\n3. Soru: Rust'ta OOP nedir?\n\nCevap: Rust'ta OOP (Object-Oriented Programming), nesne tabanlı programlama yaklaşımını ifade eder. Bu yaklaşım, sınıf, override, private erişimler, nesne fonksiyonları gibi temel modelleme konularını içerir.\n\n4. Soru: Rust'ta shadowing nedir?\n\nCevap: Rust'ta shadowing, bir değişkenin değerini başka bir değişkene aktarmak için kullanılan bir yöntemdir. Örneğin, `let x = 5;` ifadesinde, `x` isimli değişkenin değeri 5'e eşitlenir. Daha sonra, `let x = 10;` ifadesinde, `x` isimli değişkenin değeri 10'e eşitlenir. Bu durum, shadowing olarak adlandırılır.\n\nKaynak: [1] Programcıdan Programcıya Rust (2021-12-24) - Giriş\n[2] Rust Dilinde Phantom Type Kullanımı: PhantomData (2026-05-09) - PhantomData ile Tür Güvenliği Sağlama\n[3] Rust Pratikleri - OOP (2022-04-24) - Giriş\n[4] Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir? (2020-12-31) - Sepeti Doldurmaya Devam",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0037",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2026-05-09-rust-phantom-data#0006",
+          "title": "Rust Dilinde Phantom Type Kullanımı: PhantomData",
+          "url": "https://buraksenyurt.github.io/2026/05/09/rust-phantom-data/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2022-04-24-rust-pratikleri-oop#0002",
+          "title": "Rust Pratikleri - OOP",
+          "url": "https://buraksenyurt.github.io/2022/04/24/rust-pratikleri-oop/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 248.62,
+      "first_token_seconds": 5.48,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "rust-lifetimes",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta lifetime kavramı neden gereklidir?",
+      "expected": null,
+      "answer": "Rust'ta lifetime kavramı, güvenli bir bellek yönetimi için gerekli bir yapıdır. Rust derleyicisi, çalışma zamanının mümkün olduğunca az değişkenle uğraşmasını ve referansların gereksiz yere yaşamamasını tercih eder. Lifetime parametreleri, nesnelerin kullanım sürelerini belirtmek için kullanılır. Bu sayede, derleyici, nesnelerin kullanım sürelerini belirleyerek bellek yönetimini daha güvenli bir şekilde gerçekleştirebilir.\n\nÖrnek olarak, `Player` struct'unda `nick` ve `country` alanları için lifetime belirtildiğinde, bu alanların kullanım sürelerini belirlemek için kullanılır. Bu sayede, derleyici, `Player` nesnesinin kullanım süresi boyunca bu alanların kullanım sürelerini belirleyebilir.\n\nLifetime parametreleri, Rust'ta güvenli bir bellek yönetimi için gerekli bir yapıdır. Bu sayede, derleyici, bellek yönetimini daha güvenli bir şekilde gerçekleştirebilir ve programın çalışmasını daha stabil hale getirilebilir.\n\nKaynak: [1], [2], [3]",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0040",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0000",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0009",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0007",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 73.71,
+      "first_token_seconds": 3.97,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "go-defer-panic",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Go'da defer, panic ve recover nasıl çalışır?",
+      "expected": null,
+      "answer": "BAĞLAM'daki bilgilerine dayanarak, Go dilinde `defer`, `panic` ve `recover` kavramlarını şu şekilde çalıştırılır:\n\n* `defer`: Bir fonksiyonun sonuna eklenen kod bloğu. Bu kod bloğu, fonksiyonun çalışması durdurulmadan önce çalışır.\n* `panic`: Çalışma zamanında bir hata oluştuğunda, programı durdurur ve uygun bir 500 cevabı verir.\n* `recover`: Panic oluşturan fonksiyonun sonuna eklenen kod bloğu. Bu kod bloğu, panic oluşturan fonksiyonun çalışması durdurulmadan önce çalışır.\n\nYukarıdaki bağlamda verilen örnek kodlar, `defer` ve `panic` kavramlarının nasıl kullanıldığını gösterir. `recover` fonksiyonunu kullanarak, panic oluşturan fonksiyonun sonuna eklenen kod bloğu, panic oluşturan fonksiyonun çalışması durdurulmadan önce çalışır.\n\nÖrnek olarak, aşağıdaki kod parçasında, `numbers[6] = 10` satırı, çalışma zamanında bir hata oluşur. Bu hata, `panic` oluşturulur ve programı durdurur. Ancak, `recover` fonksiyonunu kullanarak, panic oluşturan fonksiyonun sonuna eklenen kod bloğu, panic oluşturan fonksiyonun çalışması durdurulmadan önce çalışır.\n\n```go\nnumbers := make([]int, 5)\ndefer easy(numbers)\nnumbers[6] = 10\nfmt.Println(\"have fun\")\n```\n\nBu kod parçasında, `easy` fonksiyonu, `recover` fonksiyonunu kullanarak, panic oluşturan fonksiyonun sonuna eklenen kod bloğu, panic oluşturan fonksiyonun çalışması durdurulmadan önce çalışır.\n\nKaynak: [1], [2], [3]",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0004",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0005",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0008",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek#0000",
+          "title": "GO Ortamında Minik Bir CRUD Servisini Gin-Gonic ile Geliştirmek",
+          "url": "https://buraksenyurt.github.io/2020/09/03/go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek/",
+          "relevant": false,
+          "cited": false
+        }
+      ],
+      "cited": [],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 130.63,
+      "first_token_seconds": 3.98,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "hard-test-email-sending",
+      "type": "example",
+      "difficulty": "hard",
+      "question": "E-posta gönderen bir kodu gerçek bir posta sunucusu olmadan nasıl test edebilirim?",
+      "expected": null,
+      "answer": "Sorunuz, e-posta gönderen bir kodu gerçek bir posta sunucusu olmadan nasıl test edebilirim?\n\nCevap: Bağlamda bahsedilen hafif (lightweight) bir sahte (fake) sunucu oluşturarak test edebilirsiniz. Bu sunucunun temel bazı komutlarını taklit eden, gelen mesajları diske yazan ve gerektiğinde belirli senaryolarda hata da dönebilen bir kod olmalıdır.\n\nÖrnek olarak, bağlamda bahsedilen #4 Testler için Bir Mail Sunucusu Yazmak (2026-09-07) maddesinde verilen kod örneği gayet yeterli olabilir. Bu kod, .NET tabanlı basit bir konsol uygulaması olarak tasarlanmış ve temel SMTP hizmetini taklit eden bir e-posta sunucumuza bağlanarak mesaj göndermektedir.\n\n```csharp\nusing System.Net.Mail;\n\nSendEmail(\"burak.selim@azon.com\", \"<h1>Challenge Accepted</h1><p>This is a sample e-mail from dotnet client</p>\", true);\n```\n\nBu kod, 127.0.0.1 adresine bağlanarak mesaj göndermektedir. Bağlamda bahsedilen hafif sunucunun bu kodu taklit etmesi gerekir.\n\nKaynak: [#4] Testler için Bir Mail Sunucusu Yazmak (2026-09-07) — O Zaman Bir İstemci (Client) Yazalım",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2026-09-07-light-mail-server#0001",
+          "title": "Testler için Bir Mail Sunucusu Yazmak",
+          "url": "https://buraksenyurt.github.io/2026/09/07/light-mail-server/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2018-04-07-express-api-hizmetini-heroku-uzerine-tasimak#0006",
+          "title": "Express API Hizmetini Heroku Üzerine Taşımak",
+          "url": "https://buraksenyurt.github.io/2018/04/07/express-api-hizmetini-heroku-uzerine-tasimak/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi#0010",
+          "title": "TCP Bazlı Soket Haberleşmesinde Sertifika Kullanımı",
+          "url": "https://buraksenyurt.github.io/2015/11/09/tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2026-09-07-light-mail-server#0013",
+          "title": "Testler için Bir Mail Sunucusu Yazmak",
+          "url": "https://buraksenyurt.github.io/2026/09/07/light-mail-server/",
+          "relevant": true,
+          "cited": true
+        }
+      ],
+      "cited": [
+        4
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 128.49,
+      "first_token_seconds": 2.73,
+      "facts": [],
+      "error": null
+    }
+  ]
+}

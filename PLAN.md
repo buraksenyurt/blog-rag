@@ -191,6 +191,39 @@ blog-rag/
 - Kavram isimleri normalize edilecek (küçük harf, TR/EN eşleştirmesi, örn. "değişken gölgeleme" ↔ "shadowing"). Bunun için embedding benzerliğiyle birleştirme yapılacak.
 - Sonuçlar yeterince iyiyse kapsam genişletilecek. Değilse sadece deterministik graph ile devam edilecek.
 
+- Uygulama (Adım 9): `phase2_graph/concepts.py` ve `extract_entities.py`.
+  - Birim yazı başına bir LLM çağrısı. Girdi başlık, tag'ler, bölüm başlıkları ve ~12.000 karakterlik özet (kod blokları ilk 8 satırla sınırlı). Chunk başına çağrı bu makinede saatler sürerdi, bu yüzden yazı seviyesinde çalışılıyor.
+  - Çıktı JSON şemasıyla zorlanıyor (LM Studio structured output). Kavram adları küçük harfli İngilizce terimler, Türkçe karşılıkları `aliases` alanında. En fazla 15 kavram çıkarılıyor. Tür ve ilişki çeşidi sabit listelerden seçiliyor.
+  - Sonuçlar `data/concepts/{model}/` altında yazı başına cache'leniyor. Yarıda kalan çalıştırma kaldığı yerden devam ediyor.
+  - Birleştirme sadece metin üzerinden yapılıyor: ad ile takma adın eşleşmesi ve tekil/çoğul farkı. embeddinggemma skorları dar aralıkta olduğu için embedding benzerliğiyle otomatik birleştirme yapılmıyor (yanlış birleştirme riski).
+  - Graph'a eklenenler: `(:Concept {name, type, aliases, df})`, `(Post)-[:ABOUT]->(Concept)`, `(Chunk)-[:MENTIONS]->(Concept)` ve `(Concept)-[:RELATED_TO {kind, count}]->(Concept)`. `MENTIONS` kavram adı ya da takma adının pilot yazıların chunk metninde kelime sınırıyla geçmesine göre kuruluyor, LLM kullanılmıyor.
+  - Retrieval'da `concept_expand` seçeneği var: sorguda adı ya da takma adı geçen ve en fazla 8 yazıda görülen kavramların geçtiği chunk'lar aday havuzuna +0.03 ile ekleniyor. `rust` gibi çok yazıda geçen merkez kavramlar kullanılmıyor. Eval'deki karşılığı `concepts` varyantı.
+  - Dry-run (3 yazı, gemma-3-4b-it-qat, yazı başına ~2 dakika): Kavramlar isabetli çıktı (ownership, borrowing, lifetime, borrow-checker, tokio, warp, serde…). Takma adla birleştirme çalıştı (lifetimes → lifetime, borrow checker → borrow-checker). Görülen sorunlar ve düzeltmeler:
+    - (1) Modelin önerdiği takma adların yarısına yakını yazının metninde geçmiyordu ("possession", "memory allocation", "compiler check"). Takma adlar artık kavramda tutuluyor ama MENTIONS sadece kanıtlı terimlerle (`mention_terms`) kuruluyor. Kanıtlı terim, kavramın adı ya da önerildiği yazının metninde gerçekten geçen takma ad demek.
+    - (2) `shadowing` uzun yazının 11.400. karakterindeydi, 7.000 karakterlik bütçeye girmiyordu. Bütçe 12.000 karaktere (~4,5 bin token), kavram sınırı 15'e çıkarıldı.
+    - (3) Bir kavram Türkçe adla döndü ("asenkron programlama"). Prompt'a İngilizce ad kuralı açıkça eklendi.
+    - (4) Eşleştirme deseninde kelime sınırı sadece ilk ve son alternatife uygulanıyordu, gruplanarak düzeltildi.
+    - Prompt değiştiği için cache `v2` klasörüne yazılıyor.
+  - Dry-run v2 (3 yazı): Uzun Rust yazısının 15 kavramı neredeyse birebir tag listesinden geldi, `shadowing` yine çıkmadı. Kanıtlı takma adların bir kısmı da yanlış eşleşiyordu ("kopyalama" → borrowing, "package" → crate, "reference counting" iki ayrı kavramda). Düzeltmeler (v3):
+    - (5) Tag'ler özete verilmiyor. Tag'ler graph'ta zaten var, kavram katmanı metinden yeni bilgi çıkarmalı.
+    - (6) MENTIONS yalnızca kavram adlarıyla kuruluyor: kanonik ad ve onunla birleşen adlar, metinde geçiyorsa. Takma adlar sadece sorgudaki Türkçe terimi kavrama bağlamak için kullanılıyor. Yazar İngilizce terimleri çoğunlukla parantez içinde verdiği için ("Sahiplenme (Ownership)") ad bazlı eşleştirme yeterli.
+    - (7) Seçimin konusu olan tag'lerle aynı adlı kavramlar (`rust`) atılıyor. Aksi halde 119 chunk'a bağlanan bir merkez düğüm oluşuyordu.
+  - Dry-run v3 (3 yazı): Kavramlar artık tag kopyası değil (async-std, message passing, higher order function, heap/stack memory, webassembly). `shadowing` yine seçilmedi: model 15 kavramlık sınırda daha genel kavramları öne alıyor. Yeni bulgular:
+    - (8) Model kod ifadelerini kavram sandı (`println!` 70 chunk'ta, `main` 66 chunk'ta, `String::from`). `::`, `!`, parantez, `<>` içeren adlar ve `main` gibi genel adlar atılıyor. Bu filtre kavram sayısını 31'den 27'ye, MENTIONS'ı 395'ten 227'ye indirdi. Cache bozulmadığı için yeniden çıkarım gerekmedi.
+    - (9) Eval'deki Go sorusu "channel" kelimesiyle Rust'ın channel kavramına eşleniyordu. Sorguda teknoloji varsa kavram adayları artık sadece o teknolojinin tag'ine sahip yazılardan geliyor.
+  - Tam çalıştırma v3 (46 yazı, gemma-3-4b-it-qat):
+    - 45 yazı başarılı. `tauri-hello-world` yazısında çıktı max_tokens'ta kesildi ve JSON yarım kaldı.
+    - Asıl sorun prompt'tan sızma: en çok yazıda görünen 8 kavram (ownership 36, lifetime 31, smart pointer 30, borrowing 29, trait object 28, channel 26, tokio 23, shadowing 18) prompt'taki örnek listesinin birebir aynısıydı. Kavram atamalarının %38'i (626'da 239) yazının metninde ne adıyla ne Türkçe karşılığıyla geçiyordu. `shadowing`'in 18 atamasının 18'i de kanıtsızdı.
+    - `var` kavramı Türkçe "var" kelimesiyle eşleşip 221 chunk'a bağlanmıştı.
+    - Düzeltmeler (v4):
+      - (10) Kanıt kontrolü: kavram, adı ya da bir karşılığı yazının metninde geçmiyorsa o yazıya bağlanmıyor. Kontrol deterministik olduğu için v3 cache'ine de uygulanabiliyor. Sonuç: 224 kavram, 367 ABOUT, 3.208 MENTIONS. En yaygın kavramlar artık ownership (20), borrowing (11), smart pointer (11), lifetime (9), cargo (8).
+      - (11) Prompt'taki Rust örnekleri kaldırıldı. Yerine alan dışı bir biçim örneği kondu ("çöp toplayıcı" → garbage collection). Ayrıca "yazıda geçmeyen kavram ekleme" kuralı eklendi.
+      - (12) Türkçe yaygın kelimelerle çakışan adlar (var, yok, bir, ile…) ve `&`/`*` içeren kod ifadeleri atılıyor.
+      - (13) JSON şemasına üst sınırlar eklendi (15 kavram, 4 takma ad, 20 ilişki). max_tokens 2.048'e çıkarıldı. JSON yarım kalırsa 3.072 ile bir kez daha deneniyor.
+    - v3 cache'i `--cache-version 3` ile kullanılabiliyor. Temiz bir pilot için v4 ile yeniden çıkarım öneriliyor (~1,5–2 saat).
+  - Bilinen sınırlar: Özete tag'ler de girdiği için model kavramların bir kısmını tag'lerden tekrar edebilir. Çok uzun yazılarda 12.000 karakter sınırı sonraki bölümleri dışarıda bırakıyor (bölüm başlıkları yine de listede).
+- Giriş araması (2026-11-25 kararı): Faz 2'de varsayılan olarak tam cosine kullanılıyor (`exact_search=True`). Ölçüm (20 Kasım): `exact` varyantı Faz 1 ile birebir aynı sonucu verdi (Hit@ctx 0,956, zor sorularda 0,846). Quantization kapatılmış HNSW index'i ise hâlâ geride kaldı (0,911 / 0,769). 10 bin chunk için tam cosine yeterince hızlı. Böylece iki faz arasındaki fark yalnızca graph katmanından geliyor. Index karşılaştırma için `vector` varyantında tutuluyor.
+
 ### 2.5 Graph Retrieval (`retrieve.py`)
 1. **Giriş noktası:** Neo4j vector index ile top-k chunk bulunacak (Faz 1 ile aynı mantık).
 2. **Genişletme (Cypher):**
@@ -233,6 +266,11 @@ blog-rag/
 - Bütün sonuçlar `eval/results/{faz}-{model}-{tarih}.json` olarak kaydedilecek.
 - Uygulama (Adım 6): `eval/questions.yaml` dosyasında 35 soru var: 29 example, 3 relational, 3 structural. Beklenen yazılar korpusta aranarak elle eşlendi, tamamı doğrulandı. `eval/run_eval.py` retrieval varyantlarını (`plain`, `filter`, `filter+code`, `full`) aynı sorgu vektörüyle kıyaslıyor. Metrikler post seviyesinde: Hit@ctx, Recall@ctx, MRR@20, Recall@20. `--with-llm` cevapları da üretiyor ve atıf oranı, Türkçe oranı ve süreyi ölçüyor. Manuel 1-5 puanlama için ayrıca bir markdown dosyası yazıyor.
 - İlk ölçüm (2026-11-13, embeddinggemma, 32 soru): `plain` Hit@ctx 0,969 · Recall@ctx 0,891 · MRR 0,892 · Recall@20 0,977. `filter` sonucu birebir aynı çıktı. Kod boost'u MRR'yi 0,888'e düşürdü. Soruların neredeyse hepsi teknoloji adını içerdiği için set tavana yakındı ve varyantları ayırt edemedi. Tek ıskalanan `parallel-for` sorusu bir etiketleme sorunuydu: beklenen listeye `forparallelism` ve `parallel-programming-reduction` yazıları eklendi.
+- Küçük LLM kıyası (2026-11-20, Faz 1 retrieval, 5 soru, 4 chunk, 2.000 token bütçe):
+  - Ortalama üretim süresi: Llama 3 8B 149 sn, `gemma-3-4b-it-qat` 68 sn. İkisinde de ilk token ~5 sn, yani süreyi bağlam işleme değil token üretimi belirliyor.
+  - Atıf yapan cevap: Llama 1/5, Gemma 5/5. Türkçe oranı: Llama 1,00, Gemma 0,97.
+  - İki model de Rust sorularında kavram hataları yaptı. Llama, shadowing sorusunda yine kendine sorular uydurup cevapladı ve kaynakları kurala aykırı biçimde listeledi. Gemma Go (defer/panic/recover) ve e-posta testi sorularında doğru ve kaynaklı cevap verdi.
+  - Yanlışlıkla `qwen3-4b-thinking-2507` indirildi. Bu model bütün çıktısını düşünme bölümüne yazdığı için 5 cevabın hepsi boş döndü (ortalama 272 sn). Ölçümün `qwen3-4b-instruct-2507` ile tekrarlanması gerekiyor. Boş cevaplar artık eval'de hata olarak işaretleniyor.
 - Set genişletildi (48 soru): teknoloji ya da kavram adı geçmeyen, günlük dille sorulmuş 13 **zor soru** (`difficulty: hard`) eklendi. Örnek: "Bir değişkeni fonksiyona verdikten sonra neden tekrar kullanamıyorum?" Eval özeti normal ve zor soruları ayrı raporluyor.
 - LLM'li eval'de cevaplar stream ediliyor. Zaman aşımı `LLM_TIMEOUT` ile ayarlanabiliyor (varsayılan 900 sn) ve zaman aşımına düşen üretim tekrar denenmiyor. Hata veren soru kaydedilip geçiliyor, sonuçlar her sorudan sonra dosyaya yazılıyor. Her cevap için ilk token süresi (prefill) ayrıca ölçülüyor. `--n` ve `--budget` ile bağlam küçültülebiliyor.
 
@@ -251,8 +289,8 @@ blog-rag/
 **Faz 2**
 7. ✅ Neo4j compose'a eklenecek + `build_graph.py` (deterministik graph + vector index)
 8. ✅ Graph retrieval + `ask.py`
-9. Pilot entity extraction (Rust alt kümesi)
-10. Faz 1 ve Faz 2 karşılaştırmalı eval + bulguların yazılması
+9. ✅ Pilot entity extraction (Rust alt kümesi)
+10. ✅ Faz 1 ve Faz 2 karşılaştırmalı eval + bulguların yazılması → [docs/FINDINGS.md](./docs/FINDINGS.md), tablolar `eval.report` ile
 
 ---
 

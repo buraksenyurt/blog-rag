@@ -1,0 +1,286 @@
+{
+  "model": "gemma-3-4b-it-qat",
+  "embedding_profile": "embeddinggemma",
+  "retrieval_config": {
+    "k": 20,
+    "n": 4,
+    "use_filter": true,
+    "boost": 0.05,
+    "max_per_post": 3,
+    "mmr_lambda": 0.7,
+    "token_budget": 2000,
+    "code_boost": 0.02,
+    "expand_short": true,
+    "short_tokens": 150
+  },
+  "summary": {
+    "answered": 5,
+    "errors": 0,
+    "citation_rate": 1.0,
+    "turkish_ratio": 0.97,
+    "generation_seconds": 68.3,
+    "first_token_seconds": 5.6
+  },
+  "answers": [
+    {
+      "id": "rust-variables",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust dilinde değişken kullanımları ile ilgili örnekler yaz.",
+      "expected": null,
+      "answer": "Rust dilinde değişken kullanımları, temel olarak iki farklı şekilde gerçekleşir: referanslar ve değer kopyaları.\n\nDeğer kopyası durumunda, bir değişkenden diğerine veri taşınırken yeni bir kopya oluşturulur. Bu, özellikle büyük veri yapıları için performans açısından maliyetli olabilir. Örnek olarak `main` fonksiyonundaki `intro` değişkeni `get_count` fonksiyonuna ödünç verilirken, değer kopyalanır ve `get_count` fonksiyonu bu yeni kopyayı değiştirir.  Bu durum, `intro` değişkeninin asıl değerinin değişmemesi anlamına gelir [#1].\n\nReferanslar ise, bir değişkenden diğerine işaret edilmesini sağlar. Bu durumda, orijinal değişkene erişim mümkün olur ve aynı bellek konumunu paylaşırlar.  Örnek olarak `main` fonksiyonundaki `score` değişkeni `print_number` fonksiyonuna referans olarak verilir. Bu sayede, `print_number` fonksiyonu `score` değişkeninin değerini doğrudan değiştirebilir. [#1]\n\nRust'ta varsayılan olarak değişkenlerin immutable (değiştirilemez) olması, bu durumun kontrol altında tutulmasını sağlar. Mutable (değiştirilebilir) bir referans oluşturmak için `&mut` anahtar kelimesi kullanılır.  [#2]\n",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0034",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": true
+        },
+        {
+          "n": 2,
+          "id": "2022-04-17-rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak#0006",
+          "title": "Rust Pratikleri - Değişkenleri Kopyalayarak veya Referans Olarak Taşımak",
+          "url": "https://buraksenyurt.github.io/2022/04/17/rust-pratikleri-degiskenleri-kopyalayarak-veya-referans-olarak-tasimak/",
+          "relevant": true,
+          "cited": true
+        },
+        {
+          "n": 3,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2021-12-24-programcidan-programciya-rust#0025",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [
+        1,
+        2
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 67.4,
+      "first_token_seconds": 6.92,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "rust-shadowing",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta shadowing nedir, örnekle açıklar mısın?",
+      "expected": null,
+      "answer": "Rust dilinde shadowing, aynı isimde bir değişkenin farklı scope içinde tanımlanması durumudur. Bu, derleyicinin hangi değişkeni referans alacağını belirlemesini sağlar.  Bu işlem, değişkenlerin yaşam ömrü ve kapsamı dikkate alınarak yapılır. [#1]\n\nÖrneğin, ilk bağlamda `let mine = 6;` ve `let yours = 7;` ifadeleri ile `mine` ve `yours` adlı iki değişken tanımlanmıştır. Daha sonra `let result = find_greatest(&mine, &yours);` ifadesinde `find_greatest` fonksiyonuna `mine` ve `yours` değişkenlerinin referansları gönderilir. Ancak `find_greatest` fonksiyonu içindeki `if x > y { return x; } else { return y; }` blokunda `x` ve `y` değişkenleri, `mine` ve `yours` değişkenlerine atanan değerlere (6 ve 7) referans verir.  Bu durumda, `println!(\"{}\", result);` ifadesinde `result` değişkeni, `find_greatest` fonksiyonunun döndürdüğü değeri alır. [#1]\n\nShadowing'in temel amacı, aynı isimde birden fazla değişken tanımlanırken kafa karışıklığını önlemektir.  Bu sayede, hangi değişkenin kullanıldığının açıkça belirtilmesi sağlanır. [#2]\n",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0037",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": true
+        },
+        {
+          "n": 2,
+          "id": "2026-05-09-rust-phantom-data#0006",
+          "title": "Rust Dilinde Phantom Type Kullanımı: PhantomData",
+          "url": "https://buraksenyurt.github.io/2026/05/09/rust-phantom-data/",
+          "relevant": false,
+          "cited": true
+        },
+        {
+          "n": 3,
+          "id": "2022-04-24-rust-pratikleri-oop#0002",
+          "title": "Rust Pratikleri - OOP",
+          "url": "https://buraksenyurt.github.io/2022/04/24/rust-pratikleri-oop/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2020-12-31-stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir#0009",
+          "title": "Stackoverflow Sevgi Anketinde Yıllardır Bir Numara Çıkan Programlama Dili Rust Kimdir?",
+          "url": "https://buraksenyurt.github.io/2020/12/31/stackoverflow-sevgi-anketinde-yillardir-bir-numara-cikan-programlama-dili-rust-kimdir/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [
+        1,
+        2
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 0.94,
+      "generation_seconds": 54.53,
+      "first_token_seconds": 5.7,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "rust-lifetimes",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Rust'ta lifetime kavramı neden gereklidir?",
+      "expected": null,
+      "answer": "Rust’ın bellek yönetimi için getirdiği kurallar sayesinde, özellikle Garbage Collector kullanan dillerden farklı olarak güvenli bir bellek ortamını garanti eder. Ownership ve borrowing gibi kavramlar sayesinde Rust, bellek sızıntılarını ve dangling pointer'ları önlemeyi hedefler. Bu nedenle lifetime kavramı gereklidir. Lifetimes, nesnelerin yaşam sürelerini bilinçli olarak vermek için kullanılır ve derleyicinin bu süreleri doğru şekilde yönetmesini sağlar [#2].  Özellikle `new` ve `change_nickname` fonksiyonlarında kullanılan lifetime bildirimleri, oyuncu nesnesinin kullanım süresini belirtir ve bu sayede referansların gereksiz yere yaşamaması sağlanır. Bu durum, kaynakların etkin kullanımı açısından önemlidir [#3, #4].",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2021-12-24-programcidan-programciya-rust#0040",
+          "title": "Programcıdan Programcıya Rust",
+          "url": "https://buraksenyurt.github.io/2021/12/24/programcidan-programciya-rust/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0000",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": true
+        },
+        {
+          "n": 3,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0009",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2022-03-06-rust-pratikleri-lifetimes-mevzusu#0007",
+          "title": "Rust Pratikleri - Lifetimes Mevzusu",
+          "url": "https://buraksenyurt.github.io/2022/03/06/rust-pratikleri-lifetimes-mevzusu/",
+          "relevant": true,
+          "cited": false
+        }
+      ],
+      "cited": [
+        2
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 31.1,
+      "first_token_seconds": 4.75,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "go-defer-panic",
+      "type": "example",
+      "difficulty": "normal",
+      "question": "Go'da defer, panic ve recover nasıl çalışır?",
+      "expected": null,
+      "answer": "Go’da `defer`, `panic` ve `recover` kavramları birlikte çalışarak programın hatalarla başa çıkmasına yardımcı olur.\n\n`panic` durumu, programın beklenmedik bir hatayla karşılaştığında ortaya çıkar. Bu durum genellikle dizinin olmayan elemanına erişilmeye çalışılması, dosyanın bulunamaması gibi durumlarda meydana gelir. `#1`’de anlatıldığı gibi, `panic` oluştuğunda mevcut fonksiyonun çalışması durdurulur ve varsa `defer` edilmiş fonksiyonlar çalıştırılır. Sonrasında fonksiyonun sahibi olan konuma (function caller) dönülür ancak devam eden kod satırları işletilmez.\n\n`recover()` fonksiyonu ise `panic` durumunu sakin bir şekilde sonuçlandırmak için kullanılır. `#2`’de anlatıldığı gibi, `recover()` çağrımlarının anlamlı olması için `defer` ile birlikte kullanılması gerekir. `defer` ile tanımlanan fonksiyonlar `panic` oluştuğunda çalışır ve `recover()` fonksiyonu bu fonksiyonların içindeki hataları yakalar.  Örneğin, `#2`’de gösterilen kod parçası, `numbers[6] = 10` satırında bir `panic` oluşturur. Ancak `defer easy(numbers)` ifadesi sayesinde `easy` fonksiyonu çalıştırılır ve içinde `recover()` ile bu panik yakalanır. Bu sayede programın çökmesi engellenir ve \"slice length is : 5\" yazdırılır. `#3`’de anlatıldığı gibi, `panic` üreten fonksiyonun çağırıcısındaki `defer` operasyonu devreye girdiğinde program kontrolü main'e döner ve \"to be continued...\" yazdırılır.\n\nGin-Gonic framework’ünde `Recover` modülü, HTTP talepleriyle ilgili bir `panic` oluştuğunda otomatik olarak 500 hata kodu döndürür. `#4`’de bu durum belirtilmiştir. Bu da Go'nun programlama dilindeki hata yönetimi mekanizmalarının önemli bir parçasıdır.\n\n[#1]\n[#2]\n[#3]\n[#4]",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0004",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": true
+        },
+        {
+          "n": 2,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0005",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": true
+        },
+        {
+          "n": 3,
+          "id": "2017-03-09-golang-defer-panic-ve-recover-kavramlarini-taniyalim#0008",
+          "title": "GoLang - defer, panic ve recover Kavramlarını Tanıyalım",
+          "url": "https://buraksenyurt.github.io/2017/03/09/golang-defer-panic-ve-recover-kavramlarini-taniyalim/",
+          "relevant": true,
+          "cited": true
+        },
+        {
+          "n": 4,
+          "id": "2020-09-03-go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek#0000",
+          "title": "GO Ortamında Minik Bir CRUD Servisini Gin-Gonic ile Geliştirmek",
+          "url": "https://buraksenyurt.github.io/2020/09/03/go-ortaminda-minik-bir-crud-servisini-gin-gonic-ile-gelistirmek/",
+          "relevant": false,
+          "cited": true
+        }
+      ],
+      "cited": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 0.93,
+      "generation_seconds": 88.0,
+      "first_token_seconds": 6.19,
+      "facts": [],
+      "error": null
+    },
+    {
+      "id": "hard-test-email-sending",
+      "type": "example",
+      "difficulty": "hard",
+      "question": "E-posta gönderen bir kodu gerçek bir posta sunucusu olmadan nasıl test edebilirim?",
+      "expected": null,
+      "answer": "Gerçek bir posta sunucusu olmadan e-posta gönderme kodunu test etmek için, Docker container olarak çalışan ve temel SMTP hizmetini taklit eden bir e-posta sunucusu kullanabilirsiniz. Bu sunucu, `127.0.0.1` portu 2525 üzerinde çalışmaktadır [#4].\n\nBu durumda, C# kodu içerisinde bu sunucuya bağlanıp e-postaları gönderebilirsiniz. Örneğin, kodda belirtilen `SmtpClient` nesnesi ile bu sunucunun adresini ve portunu kullanarak e-posta gönderme işlemi gerçekleştirilebilir [#4].  Ayrıca, hata yakalama mekanizması ile olası SMTP hataları (örneğin 421 hatası) da test edebilirsiniz [#4].\n\n```csharp\nusing System.Net.Mail;\n\nSendEmail(\"burak.selim@azon.com\", \"<h1>Challenge Accepted</h1><p>This is a sample e-mail from dotnet client</p>\", true);\nSendEmail(\"thereisnomail@nowhere.nowhere\", \"<h1>Error Test</h1><p>We are waiting for 421 error.</p>\", true);\n\nstatic void SendEmail(string to, string body, bool isHtml)\n{\n    try\n    {\n        var client = new SmtpClient(\"127.0.0.1\", 2525)\n        {\n            DeliveryMethod = SmtpDeliveryMethod.Network\n        };\n\n        var message = new MailMessage(\"test.pilot@azon.com\", to, \"Demonstration Subject\", body)\n        {\n            IsBodyHtml = isHtml\n        };\n\n        Console.WriteLine($\"Sending email to {to}...\");\n        client.Send(message);\n        Console.WriteLine(\"Email sent successfully!\\n\");\n    }\n    catch (SmtpException ex)\n    {\n        Console.WriteLine($\"SMTP Error: {ex.StatusCode} - {ex.Message}\\n\");\n    }\n    catch (Exception ex)\n    {\n        Console.WriteLine($\"General Error: {ex.Message}\\n\");\n    }\n}\n```\n\n[#4]\n",
+      "sources": [
+        {
+          "n": 1,
+          "id": "2026-09-07-light-mail-server#0001",
+          "title": "Testler için Bir Mail Sunucusu Yazmak",
+          "url": "https://buraksenyurt.github.io/2026/09/07/light-mail-server/",
+          "relevant": true,
+          "cited": false
+        },
+        {
+          "n": 2,
+          "id": "2018-04-07-express-api-hizmetini-heroku-uzerine-tasimak#0006",
+          "title": "Express API Hizmetini Heroku Üzerine Taşımak",
+          "url": "https://buraksenyurt.github.io/2018/04/07/express-api-hizmetini-heroku-uzerine-tasimak/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 3,
+          "id": "2015-11-09-tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi#0010",
+          "title": "TCP Bazlı Soket Haberleşmesinde Sertifika Kullanımı",
+          "url": "https://buraksenyurt.github.io/2015/11/09/tcp-bazli-soket-haberlesmesinde-sertifika-kullanimi/",
+          "relevant": false,
+          "cited": false
+        },
+        {
+          "n": 4,
+          "id": "2026-09-07-light-mail-server#0013",
+          "title": "Testler için Bir Mail Sunucusu Yazmak",
+          "url": "https://buraksenyurt.github.io/2026/09/07/light-mail-server/",
+          "relevant": true,
+          "cited": true
+        }
+      ],
+      "cited": [
+        4
+      ],
+      "invalid_citations": [],
+      "turkish_ratio": 1.0,
+      "generation_seconds": 100.35,
+      "first_token_seconds": 4.2,
+      "facts": [],
+      "error": null
+    }
+  ]
+}

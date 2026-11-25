@@ -112,3 +112,20 @@ def test_rebuild_vector_index_drops_creates_and_waits() -> None:
     assert queries[0].startswith("DROP INDEX chunk_embedding")
     assert queries[1].startswith("CREATE VECTOR INDEX") and "enabled`: false" in queries[1]
     assert "awaitIndexes" in queries[2]
+
+
+def test_write_concepts_rebuilds_concept_layer() -> None:
+    from phase2_graph.concepts import ConceptGraph
+    from phase2_graph.store import write_concepts
+
+    graph = ConceptGraph(
+        concepts=[{"name": "shadowing", "type": "concept", "aliases": [], "df": 1}],
+        about=[{"slug": "p1", "concept": "shadowing"}],
+        mentions=[{"chunk_id": "p1#0000", "concept": "shadowing"}],
+        relations=[],
+    )
+    run = FakeRunner()
+    write_concepts(run, graph)
+    queries = [q for q, _ in run.calls]
+    assert "concept_name" in queries[0] and "DETACH DELETE" in queries[1]
+    assert run.queries("MERGE (c)-[:MENTIONS]->(k)")[0]["rows"] == graph.mentions

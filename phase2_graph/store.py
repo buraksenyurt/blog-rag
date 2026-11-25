@@ -258,3 +258,43 @@ def wipe(driver: Driver, database: str) -> None:
     with driver.session(database=database) as session:
         session.run(Q_WIPE).consume()
         session.run(f"DROP INDEX {VECTOR_INDEX} IF EXISTS").consume()
+
+
+# --- Adım 9: kavramlar (LLM çıkarımı, pilot) -------------------------------------------
+
+Q_CLEAR_CONCEPTS = "MATCH (k:Concept) DETACH DELETE k"
+Q_CONCEPTS = """
+UNWIND $rows AS r
+MERGE (k:Concept {name: r.name})
+SET k.type = r.type, k.aliases = r.aliases, k.df = r.df, k.mention_terms = r.mention_terms
+"""
+Q_ABOUT = """
+UNWIND $rows AS r
+MATCH (p:Post {slug: r.slug}), (k:Concept {name: r.concept})
+MERGE (p)-[:ABOUT]->(k)
+"""
+Q_MENTIONS = """
+UNWIND $rows AS r
+MATCH (c:Chunk {id: r.chunk_id}), (k:Concept {name: r.concept})
+MERGE (c)-[:MENTIONS]->(k)
+"""
+Q_CONCEPT_RELATIONS = """
+UNWIND $rows AS r
+MATCH (a:Concept {name: r.source}), (b:Concept {name: r.target})
+MERGE (a)-[x:RELATED_TO {kind: r.kind}]->(b)
+SET x.count = r.count
+"""
+
+
+def write_concepts(run: Runner, graph) -> None:
+    """Kavram katmanını baştan yazar (pilot: her çalıştırmada temiz kurulum)."""
+    run("CREATE CONSTRAINT concept_name IF NOT EXISTS FOR (k:Concept) REQUIRE k.name IS UNIQUE")
+    run(Q_CLEAR_CONCEPTS)
+    for rows in batched(graph.concepts, BATCH):
+        run(Q_CONCEPTS, rows=rows)
+    for rows in batched(graph.about, BATCH):
+        run(Q_ABOUT, rows=rows)
+    for rows in batched(graph.mentions, BATCH):
+        run(Q_MENTIONS, rows=rows)
+    for rows in batched(graph.relations, BATCH):
+        run(Q_CONCEPT_RELATIONS, rows=rows)

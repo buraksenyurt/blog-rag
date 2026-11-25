@@ -13,7 +13,13 @@ import sys
 
 from openai import APIError, APITimeoutError
 
-from common.answering import answer_question, log_run, print_sources, retrieval_config
+from common.answering import (
+    answer_question,
+    empty_answer_reason,
+    log_run,
+    print_sources,
+    retrieval_config,
+)
 from common.config import get_settings, load_embedding_profile
 from common.embeddings import Embedder
 from common.llm import LLM
@@ -31,6 +37,7 @@ def main() -> int:
     parser.add_argument("--show-context", action="store_true", help="LLM'e giden bağlamı bas")
     parser.add_argument("--no-graph", action="store_true", help="graph genişletmesini kapat")
     parser.add_argument("--no-structural", action="store_true", help="yapısal sorguları kapat")
+    parser.add_argument("--concepts", action="store_true", help="kavram genişletmesini aç")
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--max-tokens", type=int, default=1024)
     parser.add_argument("--no-stream", action="store_true")
@@ -41,7 +48,11 @@ def main() -> int:
     settings = get_settings()
     profile = load_embedding_profile(settings, args.profile)
     llm = LLM(settings, model=args.model)
-    base = GraphRetrievalConfig(graph_expand=not args.no_graph, structural=not args.no_structural)
+    base = GraphRetrievalConfig(
+        graph_expand=not args.no_graph,
+        structural=not args.no_structural,
+        concept_expand=args.concepts,
+    )
     cfg = retrieval_config(args.n, args.budget, base=base)
 
     driver = connect(settings)
@@ -76,6 +87,8 @@ def main() -> int:
 
     if args.no_stream:
         print(result.answer)
+    if not result.answer.strip():
+        print(f"\n! {empty_answer_reason(llm)}")
     print_sources(result)
     first = f" (ilk token {result.first_token_seconds}s)" if result.first_token_seconds else ""
     context_tokens = sum(h.total_tokens for h in result.hits)
