@@ -105,3 +105,20 @@ def test_llm_uses_configured_timeout_without_retries() -> None:
 
     llm = LLM(Settings(_env_file=None, llm_timeout=42))
     assert llm._client.timeout == 42 and llm._client.max_retries == 0
+
+
+def test_answer_question_reuses_given_retrieval() -> None:
+    class Result:
+        hits = [hit(1)]
+        facts = ["graph bilgisi"]
+
+    class NeverRetrieve:
+        def retrieve(self, question):
+            raise AssertionError("retrieval tekrar yapılmamalı")
+
+    llm = FakeLLM("cevap [#1]")
+    result = answer_question(
+        "soru", llm, NeverRetrieve(), retrieval=Result(), retrieval_seconds=1.5
+    )
+    assert result.retrieval_seconds == 1.5 and result.cited == [1]
+    assert "GRAPH BİLGİSİ" in result.messages[1]["content"]

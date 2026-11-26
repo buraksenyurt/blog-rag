@@ -146,6 +146,35 @@ def select_mmr(candidates: list[Hit], cfg: RetrievalConfig) -> list[Hit]:
     return selected
 
 
+def candidate_rows(result: RetrievalResult) -> list[dict]:
+    """Retrieval tablosunun yapısal hali (konsol ve arayüz aynı veriyi kullanır)."""
+    selected = {h.id: (i, h) for i, h in enumerate(result.hits, start=1)}
+    rows = []
+    for rank, hit in enumerate(result.candidates, start=1):
+        p = hit.payload
+        context_no, chosen = selected.get(hit.id, (None, None))
+        rows.append(
+            {
+                "rank": rank,
+                "context": context_no,  # LLM bağlamındaki [#n] numarası, yoksa None
+                "final": round(hit.final_score, 4),
+                "score": round(hit.score, 4),
+                "boosts": ("F" if hit.boosted else "")
+                + ("k" if hit.code_boosted else "")
+                + ("G" if hit.graph_bonus else ""),
+                "tokens": hit.n_tokens,
+                "id": p["id"],
+                "title": p.get("title", ""),
+                "section": p.get("section_path") or "",
+                "code_langs": list(p.get("code_langs") or []),
+                "reasons": list(hit.reasons),
+                "extras": [e["id"] for e in chosen.extras] if chosen else [],
+                "url": p.get("url", ""),
+            }
+        )
+    return rows
+
+
 def print_result(result: RetrievalResult, show_text: bool = False) -> None:
     qf = result.query_filter
     if qf:
@@ -160,25 +189,22 @@ def print_result(result: RetrievalResult, show_text: bool = False) -> None:
         f"Aday: {len(result.candidates)} | Seçilen: {len(result.hits)} | "
         f"Context: ~{result.context_tokens} token\n"
     )
-    selected = {h.id: h for h in result.hits}
     for fact in result.facts:
         print(f"Graph bilgisi: {fact}")
     if result.facts:
         print()
     print(f"{'#':>2} {'final':>6} {'skor':>6} FKG {'tok':>5}  chunk / bölüm / diller")
-    for rank, hit in enumerate(result.candidates, start=1):
-        mark = "*" if hit.id in selected else " "
-        p = hit.payload
+    for row in candidate_rows(result):
+        mark = "*" if row["context"] else " "
         print(
-            f"{rank:>2}{mark}{hit.final_score:6.3f} {hit.score:6.3f} "
-            f"{'F' if hit.boosted else ' '}{'k' if hit.code_boosted else ' '}"
-            f"{'G' if hit.graph_bonus else ' '} "
-            f"{hit.n_tokens:>5}  {p['id']}  [{p.get('section_path') or '-'}] {p.get('code_langs')}"
+            f"{row['rank']:>2}{mark}{row['final']:6.3f} {row['score']:6.3f} "
+            f"{row['boosts']:<3} {row['tokens']:>5}  {row['id']}  "
+            f"[{row['section'] or '-'}] {row['code_langs']}"
         )
-        if hit.reasons:
-            print(f"{'':>25}↳ graph: {', '.join(hit.reasons)}")
-        for extra in selected[hit.id].extras if hit.id in selected else []:
-            print(f"{'':>25}↳ +{extra['n_tokens']} tok  {extra['id']}  (sonraki chunk eklendi)")
+        if row["reasons"]:
+            print(f"{'':>25}↳ graph: {', '.join(row['reasons'])}")
+        for extra in row["extras"]:
+            print(f"{'':>25}↳ {extra}  (sonraki chunk eklendi)")
     print(
         "\n* = LLM'e gidecek chunk, F = teknoloji filtresi boost'u, k = kod boost'u, "
         "G = graph ilişkisi boost'u"

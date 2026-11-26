@@ -365,7 +365,7 @@ ui/
 10. ✅ Faz 1 ve Faz 2 karşılaştırmalı eval + bulguların yazılması → [docs/FINDINGS.md](./docs/FINDINGS.md), tablolar `eval.report` ile
 
 **Faz 3 (demo arabirimi)**
-11. Hazırlık: `answer_question` dışarıdan retrieval sonucu alabilecek, `AskResult.messages`, retrieval tablosu için yapısal veri, `ui/service.py` (bağlantılar, servis durumu, soru çalıştırma) + testler
+11. ✅ Hazırlık: `answer_question` dışarıdan retrieval sonucu alabilecek, `AskResult.messages`, retrieval tablosu için yapısal veri, `ui/service.py` (bağlantılar, servis durumu, soru çalıştırma) + testler
 12. Streamlit arayüzü: kenar çubuğu (durum, model, ayarlar, örnek sorular), soru kutusu, tek mod cevap akışı, kaynaklar ve paneller (chunk'lar, graph bilgisi, prompt, süreler)
 13. Karşılaştır modu: iki sütun, sıralı üretim, retrieval farkı özeti
 14. Demo kolaylıkları: cevap cache'i ve yeniden üret, soru geçmişi, çalıştırma kaydı, ön ısıtma

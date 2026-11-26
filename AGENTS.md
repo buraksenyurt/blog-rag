@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10) tamamlandı, bulgular `docs/FINDINGS.md` dosyasında. Faz 3 (ders demo arabirimi, Streamlit) planlandı: PLAN.md bölüm 3b ve Adım 11–15. Sıradaki iş *Adım 11: hazırlık düzenlemeleri + `ui/service.py`*. LLM seçimi park edildi. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10) tamamlandı, bulgular `docs/FINDINGS.md` dosyasında. Faz 3 (ders demo arabirimi, Streamlit; PLAN.md bölüm 3b): Adım 11 (hazırlık + `ui/service.py`) tamamlandı. Sıradaki iş *Adım 12: Streamlit arayüzü*. LLM seçimi park edildi. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -32,7 +32,7 @@ Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 - Python 3.12, paket yönetimi için `uv` (`uv add`, `uv run`). `pip install` kullanılmaz.
 - Ayarlar `pydantic-settings` ile `.env` dosyasından okunur. Kod içinde sabit URL ya da model adı olmaz.
 - Kod tanımlayıcıları İngilizce olur. Dokümantasyon, kullanıcıya dönen mesajlar ve LLM prompt'ları Türkçe olur.
-- Modüller `common/`, `phase1_vector/`, `phase2_graph/` ve `eval/` altında yer alır. Faz modülleri ortak kodu (retrieval, answering, prompts, query_filters, chunk_store) `common/` üzerinden kullanır, birbirini import etmez. Yalnızca `eval/` iki fazı birlikte import edebilir.
+- Modüller `common/`, `phase1_vector/`, `phase2_graph/` ve `eval/` altında yer alır. Faz modülleri ortak kodu (retrieval, answering, prompts, query_filters, chunk_store) `common/` üzerinden kullanır, birbirini import etmez. Yalnızca `eval/` ve `ui/` iki fazı birlikte import edebilir. `ui/app.py` ince bir gösterim katmanıdır, mantık `ui/service.py` içindedir.
 - Ingest işlemleri idempotent olmalı: deterministik ID'ler ve embedding cache kullanılır. Bir ingest'i tekrar çalıştırmak veriyi çoğaltmamalı.
 - Chunking sırasında markdown kod blokları asla ortadan bölünmez.
 

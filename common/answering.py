@@ -34,6 +34,8 @@ class AskResult:
     retrieval_seconds: float = 0.0
     generation_seconds: float = 0.0
     first_token_seconds: float | None = None  # stream'de ilk token'a kadar geçen süre (prefill)
+    messages: list[dict[str, str]] = field(default_factory=list)  # LLM'e giden prompt
+    retrieval: RetrievalResult | None = None  # arayüzde chunk tablosu için
 
 
 def answer_question(
@@ -43,17 +45,26 @@ def answer_question(
     temperature: float = 0.2,
     max_tokens: int = 1024,
     on_token: Callable[[str], None] | None = None,
+    retrieval: RetrievalResult | None = None,
+    retrieval_seconds: float | None = None,
 ) -> AskResult:
+    """Soruyu cevaplar.
+
+    retrieval verilirse tekrar retrieval yapılmaz (arayüz önce tabloyu gösterip sonra aynı
+    sonuçla cevap üretir); süresi retrieval_seconds ile aktarılabilir.
+    """
     hits: list = []
     facts: list[str] = []
     started = time.perf_counter()
-    if retriever is not None:
+    if retrieval is None and retriever is not None:
         retrieval = retriever.retrieve(question)
+    if retrieval is not None:
         hits, facts = retrieval.hits, list(getattr(retrieval, "facts", []) or [])
         messages = build_messages(question, hits, facts)
     else:
         messages = build_no_rag_messages(question)
-    retrieval_seconds = time.perf_counter() - started
+    if retrieval_seconds is None:
+        retrieval_seconds = time.perf_counter() - started
 
     started = time.perf_counter()
     first_token_seconds: float | None = None
@@ -73,7 +84,7 @@ def answer_question(
     return AskResult(
         question=question,
         model=llm.model,
-        use_rag=retriever is not None,
+        use_rag=retrieval is not None,
         answer=answer,
         hits=hits,
         facts=facts,
@@ -82,6 +93,8 @@ def answer_question(
         retrieval_seconds=round(retrieval_seconds, 2),
         generation_seconds=round(generation_seconds, 2),
         first_token_seconds=first_token_seconds,
+        messages=messages,
+        retrieval=retrieval,
     )
 
 
@@ -119,7 +132,7 @@ def log_run(
     settings: Settings,
     profile_name: str,
     cfg: RetrievalConfig,
-    phase: int = 1,
+    phase: int | str = 1,
 ) -> None:
     runs_dir = ensure_writable(settings.data_dir / "runs", settings)
     runs_dir.mkdir(parents=True, exist_ok=True)
