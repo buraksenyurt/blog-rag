@@ -43,6 +43,9 @@ uv run python -m phase2_graph.ask "Rust Pratikleri serisinde hangi yazılar var?
 # İsteğe bağlı: LLM ile kavram çıkarımı pilotu (Rust yazıları, cache'li)
 uv run python -m phase2_graph.extract_entities --limit 3 --dry-run
 
+# Ders demo arabirimi (http://localhost:8501)
+uv run streamlit run ui/app.py
+
 # Değerlendirme ve rapor
 uv run python -m eval.run_eval --phase 1
 uv run python -m eval.run_eval --phase 2
@@ -57,5 +60,6 @@ scripts/         smoke test, chunk üretimi
 phase1_vector/   Qdrant ingest, retrieval, ask
 phase2_graph/    Neo4j graph kurulumu, graph retrieval, yapısal sorgular, kavram çıkarımı, ask
 eval/            soru seti, değerlendirme, rapor; sonuçlar eval/results/
+ui/              Streamlit demo arabirimi (app.py) ve servis katmanı (service.py)
 docs/            bulgular, ölçüm tabloları, görseller
 ```

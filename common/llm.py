@@ -61,18 +61,6 @@ class LLM:
         )
         return parse_json_answer(response.choices[0].message.content or "")
 
-
-JSON_FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)
-
-
-def parse_json_answer(text: str) -> dict:
-    """Model çıktısındaki JSON nesnesini ayrıştırır (```json çitlerini ve önsözü tolere eder)."""
-    cleaned = JSON_FENCE_RE.sub("", text.strip())
-    start, end = cleaned.find("{"), cleaned.rfind("}")
-    if start < 0 or end <= start:
-        raise ValueError(f"JSON bulunamadı: {text[:120]!r}")
-    return json.loads(cleaned[start : end + 1])
-
     def stream(
         self,
         messages: list[dict[str, str]],
@@ -99,3 +87,15 @@ def parse_json_answer(text: str) -> dict:
                 self.last_reasoning_chars += len(reasoning)
             if delta.content:
                 yield delta.content
+
+
+JSON_FENCE_RE = re.compile(r"^```(?:json)?\s*|\s*```$", re.MULTILINE)
+
+
+def parse_json_answer(text: str) -> dict:
+    """Model çıktısındaki JSON nesnesini ayrıştırır (```json çitlerini ve önsözü tolere eder)."""
+    cleaned = JSON_FENCE_RE.sub("", text.strip())
+    start, end = cleaned.find("{"), cleaned.rfind("}")
+    if start < 0 or end <= start:
+        raise ValueError(f"JSON bulunamadı: {text[:120]!r}")
+    return json.loads(cleaned[start : end + 1])

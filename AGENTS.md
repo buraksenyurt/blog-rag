@@ -15,7 +15,7 @@ Bir soru sorulduğunda, LLM'e gitmeden önce ilgili yazı parçaları bulunacak 
 
 Mimari için `docs/images/rag_high_level_view.png` dosyasına bakın.
 
-**Durum:** Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10) tamamlandı, bulgular `docs/FINDINGS.md` dosyasında. Faz 3 (ders demo arabirimi, Streamlit; PLAN.md bölüm 3b): Adım 11 (hazırlık + `ui/service.py`) tamamlandı. Sıradaki iş *Adım 12: Streamlit arayüzü*. LLM seçimi park edildi. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
+**Durum:** Faz 1 (Adım 1–6) ve Faz 2 (Adım 7–10) tamamlandı, bulgular `docs/FINDINGS.md` dosyasında. Faz 3 (ders demo arabirimi, Streamlit; PLAN.md bölüm 3b): Adım 11 (hazırlık + `ui/service.py`) ve Adım 12 (Streamlit arayüzü, tek mod) tamamlandı. Sıradaki iş *Adım 13: Karşılaştır modu*. LLM seçimi park edildi. Tamamlanan adımlar PLAN.md içinde ✅ ile işaretlenir.
 
 ## Değişmez Kurallar
 
@@ -52,6 +52,7 @@ uv run python -m phase2_graph.retrieve "soru" # graph retrieval, LLM yok (--no-g
 uv run python -m phase2_graph.ask "soru"      # Faz 2 cevap (--debug, --model X, --n, --budget)
 uv run python -m eval.run_eval --phase 2     # Faz 2 varyant kıyası (vector / exact / graph / full / concepts)
 uv run python -m eval.report --out docs/results_tables.md  # karşılaştırma tabloları
+uv run streamlit run ui/app.py               # ders demo arabirimi (http://localhost:8501)
 uv run python -m phase2_graph.extract_entities --limit 3 --dry-run  # kavram çıkarımı pilotu (Rust, cache'li)
 uv run python -m phase1_vector.ingest        # indexle (--limit N, --profile X, --recreate, --check-only)
 uv run python -m phase1_vector.retrieve "soru"  # sadece retrieval, LLM yok (--show-text, --no-filter, --no-code-boost, --no-expand)
